@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Papo de Sysadmin Eventos</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .admin-banner {
+      background-color: #fff3cd;
+      border: 1px solid #ffc107;
+      color: #856404;
+      padding: 0.75rem 1rem;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border-radius: var(--radius-card);
+      margin-bottom: 1.5rem;
+    }
+    .admin-table th {
+      background-color: var(--color-primary);
+      color: #fff;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+    .admin-table td {
+      vertical-align: middle;
+      font-size: 0.9rem;
+    }
+    .btn-deletar {
+      background-color: #dc3545;
+      color: #fff;
+      border: none;
+      padding: 0.3rem 0.6rem;
+      border-radius: var(--radius-badge);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
+    }
+    .btn-deletar:hover { background-color: #c82333; color: #fff; }
+    .btn-editar {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 0.3rem 0.6rem;
+      border-radius: var(--radius-badge);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
+    }
+    .btn-editar:hover { background-color: #0056b3; color: #fff; }
+    .btn-salvar-global {
+      background-color: var(--color-accent);
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-badge);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
+    }
+    .btn-salvar-global:hover { background-color: var(--color-accent-hover); color: #fff; }
+    .save-instructions {
+      background-color: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-badge);
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+    }
+    .edit-form {
+      background-color: #f8f9fa;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 1rem;
+      margin-top: 0.5rem;
+    }
+    .edit-form label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+    .edit-form input,
+    .edit-form select,
+    .edit-form textarea {
+      font-size: 0.85rem;
+    }
+    .add-form {
+      background-color: var(--color-card);
+      border: 2px solid var(--color-accent);
+      border-radius: var(--radius-card);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px var(--color-shadow);
+    }
+    .add-form h3 {
+      color: var(--color-accent);
+      margin-bottom: 1rem;
+    }
+    .badge-presenca-tipo {
+      display: inline-block;
+      background-color: var(--color-accent);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.15rem 0.4rem;
+      border-radius: var(--radius-badge);
+      text-transform: capitalize;
+    }
+    .changes-pending {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      z-index: 1050;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      border-radius: var(--radius-card);
+      padding: 1rem 1.5rem;
+      background-color: var(--color-card);
+      border: 2px solid var(--color-accent);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <a class="navbar-brand" href="index.html">
+      <img src="assets/logo-papo.png" alt="Papo de Sysadmin" height="35" style="filter: invert(1);">
+      <span class="ml-2">Eventos</span>
+    </a>
+    <span class="navbar-text text-white ml-auto">Painel Admin</span>
+  </nav>
+
+  <div class="container-fluid mt-4">
+    <!-- Banner de aviso -->
+    <div class="admin-banner">
+      ⚠️ Painel Admin Local — As alterações precisam ser salvas manualmente no repositório
+    </div>
+
+    <!-- Formulário Adicionar Evento -->
+    <div class="add-form" id="add-form">
+      <h3>➕ Adicionar Evento</h3>
+      <form id="form-adicionar" onsubmit="return adicionarEvento(event)">
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="add-nome">Nome *</label>
+            <input type="text" class="form-control" id="add-nome" required>
+          </div>
+          <div class="form-group col-md-3">
+            <label for="add-dataInicio">Data Início *</label>
+            <input type="date" class="form-control" id="add-dataInicio" required>
+          </div>
+          <div class="form-group col-md-3">
+            <label for="add-dataFim">Data Fim</label>
+            <input type="date" class="form-control" id="add-dataFim">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="add-local">Local</label>
+            <input type="text" class="form-control" id="add-local">
+          </div>
+          <div class="form-group col-md-3">
+            <label for="add-cidade">Cidade</label>
+            <input type="text" class="form-control" id="add-cidade">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="add-estado">Estado</label>
+            <input type="text" class="form-control" id="add-estado">
+          </div>
+          <div class="form-group col-md-3">
+            <label for="add-pais">País</label>
+            <input type="text" class="form-control" id="add-pais" value="Brasil">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="add-url">URL do Evento</label>
+            <input type="url" class="form-control" id="add-url">
+          </div>
+          <div class="form-group col-md-3">
+            <label for="add-categoria">Categoria *</label>
+            <select class="form-control" id="add-categoria" required>
+              <option value="">Selecione...</option>
+              <option value="Cloud">Cloud</option>
+              <option value="DevOps">DevOps</option>
+              <option value="Seguranca">Segurança</option>
+              <option value="Infraestrutura">Infraestrutura</option>
+              <option value="Automacao">Automação</option>
+              <option value="Observabilidade">Observabilidade</option>
+              <option value="Containers">Containers</option>
+              <option value="Linux">Linux</option>
+              <option value="Redes">Redes</option>
+              <option value="Geral">Geral</option>
+              <option value="IA">IA</option>
+              <option value="Desenvolvimento">Desenvolvimento</option>
+              <option value="Dados">Dados</option>
+              <option value="Carreira">Carreira</option>
+            </select>
+          </div>
+          <div class="form-group col-md-2">
+            <label for="add-presenca-tipo">Tipo Presença</label>
+            <select class="form-control" id="add-presenca-tipo">
+              <option value="">Nenhuma</option>
+              <option value="palestrante">Palestrante</option>
+              <option value="participante">Participante</option>
+              <option value="organizador">Organizador</option>
+              <option value="midia">Mídia</option>
+            </select>
+          </div>
+          <div class="form-group col-md-3">
+            <label for="add-descricao">Descrição</label>
+            <input type="text" class="form-control" id="add-descricao">
+          </div>
+        </div>
+        <button type="submit" class="btn btn-salvar-global">Adicionar Evento</button>
+      </form>
+    </div>
+
+    <!-- Tabela de Eventos -->
+    <div class="table-responsive">
+      <table class="table table-striped table-bordered admin-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Data Início</th>
+            <th>Categoria</th>
+            <th>Presença</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-eventos">
+        </tbody>
+      </table>
+    </div>
+
+    <p id="loading-msg" class="text-center text-muted">Carregando eventos...</p>
+  </div>
+  <!-- Floating save button -->
+  <div class="changes-pending" id="save-panel" style="display:none;">
+    <button class="btn btn-salvar-global" onclick="salvarAlteracoes()">💾 Salvar Alterações</button>
+    <div class="save-instructions" id="save-instructions" style="display:none;">
+      Substitua o arquivo <code>data/eventos.json</code> pelo arquivo baixado e faça push.
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    'use strict';
+
+    const CATEGORIAS = [
+      'Cloud', 'DevOps', 'Seguranca', 'Infraestrutura', 'Automacao',
+      'Observabilidade', 'Containers', 'Linux', 'Redes', 'Geral',
+      'IA', 'Desenvolvimento', 'Dados', 'Carreira'
+    ];
+    const TIPOS_PRESENCA = ['palestrante', 'participante', 'organizador', 'midia'];
+
+    let eventos = [];
+    let alteracoesPendentes = false;
+
+    // Load events on page load
+    document.addEventListener('DOMContentLoaded', carregarEventos);
+
+    async function carregarEventos() {
+      try {
+        const response = await fetch('data/eventos.json');
+        if (!response.ok) throw new Error('Falha ao carregar');
+        eventos = await response.json();
+        renderizarTabela();
+      } catch (err) {
+        document.getElementById('loading-msg').textContent =
+          'Erro ao carregar eventos. Verifique se o arquivo data/eventos.json existe.';
+      }
+    }
+
+    function renderizarTabela() {
+      const tbody = document.getElementById('tabela-eventos');
+      const loading = document.getElementById('loading-msg');
+      loading.style.display = 'none';
+      tbody.innerHTML = '';
+
+      eventos.forEach(function(evento, index) {
+        const tr = document.createElement('tr');
+        tr.id = 'row-' + index;
+        tr.innerHTML = renderRow(evento, index);
+        tbody.appendChild(tr);
+      });
+    }
+    function renderRow(evento, index) {
+      const presencaHtml = evento.presenca && evento.presenca.confirmada
+        ? '<span class="badge-presenca-tipo">' + escapeHtml(evento.presenca.tipo) + '</span>'
+        : '<span class="text-muted">—</span>';
+
+      return '<td>' + escapeHtml(evento.nome) + '</td>' +
+        '<td>' + formatarData(evento.dataInicio) + '</td>' +
+        '<td>' + escapeHtml(evento.categoria) + '</td>' +
+        '<td>' + presencaHtml + '</td>' +
+        '<td class="text-nowrap">' +
+          '<button class="btn-editar mr-1" onclick="editarEvento(' + index + ')">Editar</button>' +
+          '<button class="btn-deletar" onclick="deletarEvento(' + index + ')">Deletar</button>' +
+        '</td>';
+    }
+
+    function formatarData(dateStr) {
+      if (!dateStr) return '—';
+      const parts = dateStr.split('-');
+      if (parts.length !== 3) return dateStr;
+      return parts[2] + '/' + parts[1] + '/' + parts[0];
+    }
+
+    function gerarId() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
+    function adicionarEvento(e) {
+      e.preventDefault();
+
+      const nome = document.getElementById('add-nome').value.trim();
+      const dataInicio = document.getElementById('add-dataInicio').value;
+      const dataFim = document.getElementById('add-dataFim').value;
+      const local = document.getElementById('add-local').value.trim();
+      const cidade = document.getElementById('add-cidade').value.trim();
+      const estado = document.getElementById('add-estado').value.trim();
+      const pais = document.getElementById('add-pais').value.trim();
+      const url = document.getElementById('add-url').value.trim();
+      const categoria = document.getElementById('add-categoria').value;
+      const descricao = document.getElementById('add-descricao').value.trim();
+      const presencaTipo = document.getElementById('add-presenca-tipo').value;
+
+      const novoEvento = {
+        id: gerarId(),
+        nome: nome,
+        dataInicio: dataInicio,
+        local: local,
+        cidade: cidade,
+        estado: estado,
+        pais: pais,
+        url: url,
+        categoria: categoria
+      };
+
+      if (dataFim) novoEvento.dataFim = dataFim;
+      if (descricao) novoEvento.descricao = descricao;
+      if (presencaTipo) {
+        novoEvento.presenca = { confirmada: true, tipo: presencaTipo };
+      }
+
+      eventos.push(novoEvento);
+      marcarAlteracoes();
+      renderizarTabela();
+      document.getElementById('form-adicionar').reset();
+      document.getElementById('add-pais').value = 'Brasil';
+      return false;
+    }
+    function deletarEvento(index) {
+      const evento = eventos[index];
+      if (!confirm('Tem certeza que deseja deletar o evento "' + evento.nome + '"?')) {
+        return;
+      }
+      eventos.splice(index, 1);
+      marcarAlteracoes();
+      renderizarTabela();
+    }
+
+    function editarEvento(index) {
+      const evento = eventos[index];
+      const tr = document.getElementById('row-' + index);
+
+      // Check if edit form already exists
+      const existingForm = document.getElementById('edit-form-' + index);
+      if (existingForm) {
+        existingForm.remove();
+        return;
+      }
+
+      const editRow = document.createElement('tr');
+      editRow.id = 'edit-form-' + index;
+      editRow.innerHTML = '<td colspan="5">' +
+        '<div class="edit-form">' +
+          '<div class="form-row">' +
+            '<div class="form-group col-md-5">' +
+              '<label>Nome</label>' +
+              '<input type="text" class="form-control" id="edit-nome-' + index + '" value="' + escapeAttr(evento.nome) + '">' +
+            '</div>' +
+            '<div class="form-group col-md-2">' +
+              '<label>Data Início</label>' +
+              '<input type="date" class="form-control" id="edit-dataInicio-' + index + '" value="' + (evento.dataInicio || '') + '">' +
+            '</div>' +
+            '<div class="form-group col-md-2">' +
+              '<label>Data Fim</label>' +
+              '<input type="date" class="form-control" id="edit-dataFim-' + index + '" value="' + (evento.dataFim || '') + '">' +
+            '</div>' +
+            '<div class="form-group col-md-3">' +
+              '<label>Categoria</label>' +
+              '<select class="form-control" id="edit-categoria-' + index + '">' +
+                gerarOptionsCategorias(evento.categoria) +
+              '</select>' +
+            '</div>' +
+          '</div>' +
+          '<div class="form-row">' +
+            '<div class="form-group col-md-3">' +
+              '<label>Local</label>' +
+              '<input type="text" class="form-control" id="edit-local-' + index + '" value="' + escapeAttr(evento.local || '') + '">' +
+            '</div>' +
+            '<div class="form-group col-md-2">' +
+              '<label>Cidade</label>' +
+              '<input type="text" class="form-control" id="edit-cidade-' + index + '" value="' + escapeAttr(evento.cidade || '') + '">' +
+            '</div>' +
+            '<div class="form-group col-md-2">' +
+              '<label>Estado</label>' +
+              '<input type="text" class="form-control" id="edit-estado-' + index + '" value="' + escapeAttr(evento.estado || '') + '">' +
+            '</div>' +
+            '<div class="form-group col-md-2">' +
+              '<label>País</label>' +
+              '<input type="text" class="form-control" id="edit-pais-' + index + '" value="' + escapeAttr(evento.pais || '') + '">' +
+            '</div>' +
+            '<div class="form-group col-md-3">' +
+              '<label>URL</label>' +
+              '<input type="url" class="form-control" id="edit-url-' + index + '" value="' + escapeAttr(evento.url || '') + '">' +
+            '</div>' +
+          '</div>' +
+          '<div class="form-row">' +
+            '<div class="form-group col-md-4">' +
+              '<label>Descrição</label>' +
+              '<input type="text" class="form-control" id="edit-descricao-' + index + '" value="' + escapeAttr(evento.descricao || '') + '">' +
+            '</div>' +
+            '<div class="form-group col-md-3">' +
+              '<label>Tipo Presença</label>' +
+              '<select class="form-control" id="edit-presenca-' + index + '">' +
+                gerarOptionsPresenca(evento.presenca ? evento.presenca.tipo : '') +
+              '</select>' +
+            '</div>' +
+            '<div class="form-group col-md-5 d-flex align-items-end">' +
+              '<button class="btn btn-salvar-global mr-2" onclick="salvarEdicao(' + index + ')">Confirmar Edição</button>' +
+              '<button class="btn btn-secondary" onclick="cancelarEdicao(' + index + ')">Cancelar</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</td>';
+
+      tr.parentNode.insertBefore(editRow, tr.nextSibling);
+    }
+
+    function gerarOptionsCategorias(selecionada) {
+      let html = '';
+      CATEGORIAS.forEach(function(cat) {
+        const selected = cat === selecionada ? ' selected' : '';
+        html += '<option value="' + cat + '"' + selected + '>' + cat + '</option>';
+      });
+      return html;
+    }
+
+    function gerarOptionsPresenca(selecionado) {
+      let html = '<option value="">Nenhuma</option>';
+      TIPOS_PRESENCA.forEach(function(tipo) {
+        const selected = tipo === selecionado ? ' selected' : '';
+        html += '<option value="' + tipo + '"' + selected + '>' + tipo + '</option>';
+      });
+      return html;
+    }
+
+    function salvarEdicao(index) {
+      const evento = eventos[index];
+
+      evento.nome = document.getElementById('edit-nome-' + index).value.trim();
+      evento.dataInicio = document.getElementById('edit-dataInicio-' + index).value;
+      evento.dataFim = document.getElementById('edit-dataFim-' + index).value || undefined;
+      evento.local = document.getElementById('edit-local-' + index).value.trim();
+      evento.cidade = document.getElementById('edit-cidade-' + index).value.trim();
+      evento.estado = document.getElementById('edit-estado-' + index).value.trim();
+      evento.pais = document.getElementById('edit-pais-' + index).value.trim();
+      evento.url = document.getElementById('edit-url-' + index).value.trim();
+      evento.categoria = document.getElementById('edit-categoria-' + index).value;
+      evento.descricao = document.getElementById('edit-descricao-' + index).value.trim() || undefined;
+
+      const presencaTipo = document.getElementById('edit-presenca-' + index).value;
+      if (presencaTipo) {
+        evento.presenca = { confirmada: true, tipo: presencaTipo };
+      } else {
+        delete evento.presenca;
+      }
+
+      marcarAlteracoes();
+      renderizarTabela();
+    }
+    function cancelarEdicao(index) {
+      const editForm = document.getElementById('edit-form-' + index);
+      if (editForm) editForm.remove();
+    }
+
+    function marcarAlteracoes() {
+      alteracoesPendentes = true;
+      document.getElementById('save-panel').style.display = 'block';
+      document.getElementById('save-instructions').style.display = 'none';
+    }
+
+    function salvarAlteracoes() {
+      // Clean up undefined values for JSON export
+      const eventosLimpos = eventos.map(function(ev) {
+        const obj = {};
+        Object.keys(ev).forEach(function(key) {
+          if (ev[key] !== undefined && ev[key] !== '') {
+            obj[key] = ev[key];
+          }
+        });
+        return obj;
+      });
+
+      const json = JSON.stringify(eventosLimpos, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'eventos.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      document.getElementById('save-instructions').style.display = 'block';
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function escapeAttr(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+  </script>
+</body>
+</html>

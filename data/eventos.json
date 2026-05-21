@@ -1,0 +1,91 @@
+[
+  {
+    "id": "b7e2c4a1-9f3d-4e8b-a1c6-d5f0e7a2b3c4",
+    "nome": "KubeCon South America 2026",
+    "dataInicio": "2026-03-15",
+    "dataFim": "2026-03-17",
+    "local": "São Paulo Expo",
+    "cidade": "São Paulo",
+    "estado": "SP",
+    "pais": "Brasil",
+    "url": "https://events.linuxfoundation.org/kubecon-cloudnativecon-south-america/",
+    "categoria": "Containers",
+    "descricao": "Maior evento de Kubernetes e Cloud Native da América do Sul",
+    "presenca": {
+      "confirmada": true,
+      "tipo": "palestrante"
+    }
+  },
+  {
+    "id": "a3f1d8e2-6b4c-4a9e-b7d5-c2e8f1a0b6d9",
+    "nome": "DevOpsDays São Paulo 2026",
+    "dataInicio": "2026-05-20",
+    "dataFim": "2026-05-21",
+    "local": "Centro de Convenções Rebouças",
+    "cidade": "São Paulo",
+    "estado": "SP",
+    "pais": "Brasil",
+    "url": "https://devopsdays.org/events/2026-sao-paulo/welcome/",
+    "categoria": "DevOps",
+    "descricao": "Comunidade DevOps reunida para compartilhar experiências",
+    "presenca": {
+      "confirmada": true,
+      "tipo": "participante"
+    }
+  },
+  {
+    "id": "c9d4e7f3-2a1b-4c8d-9e6f-a5b3c0d1e2f4",
+    "nome": "The Developers Conference - Florianópolis 2026",
+    "dataInicio": "2026-06-10",
+    "dataFim": "2026-06-12",
+    "local": "CentroSul",
+    "cidade": "Florianópolis",
+    "estado": "SC",
+    "pais": "Brasil",
+    "url": "https://thedevconf.com/tdc/2026/florianopolis",
+    "categoria": "Geral",
+    "descricao": "Um dos maiores eventos de desenvolvedores do Brasil"
+  },
+  {
+    "id": "d1e5f8a4-3b2c-4d9e-a0f7-b6c4d2e3f5a1",
+    "nome": "BSides São Paulo 2026",
+    "dataInicio": "2026-05-20",
+    "dataFim": "2026-05-20",
+    "local": "Hotel Pullman Vila Olímpia",
+    "cidade": "São Paulo",
+    "estado": "SP",
+    "pais": "Brasil",
+    "url": "https://bsidessp.org/",
+    "categoria": "Seguranca",
+    "descricao": "Conferência de segurança da informação organizada pela comunidade"
+  },
+  {
+    "id": "e2f6a9b5-4c3d-4e0f-b1a8-c7d5e3f4a6b2",
+    "nome": "Latinoware 2026",
+    "dataInicio": "2026-10-22",
+    "dataFim": "2026-10-24",
+    "local": "Parque Tecnológico Itaipu",
+    "cidade": "Foz do Iguaçu",
+    "estado": "PR",
+    "pais": "Brasil",
+    "url": "https://latinoware.org/",
+    "categoria": "Linux",
+    "descricao": "Congresso Latino-Americano de Software Livre e Tecnologias Abertas",
+    "presenca": {
+      "confirmada": true,
+      "tipo": "organizador"
+    }
+  },
+  {
+    "nome": "TDC FLORIPA",
+    "dataInicio": "2026-07-22",
+    "local": "CentroSul - Florianópolis",
+    "cidade": "Florianopolis",
+    "estado": "Santa Catarina",
+    "pais": "Brasil",
+    "url": "https://thedevconf.com/tdc/2026/florianopolis/",
+    "categoria": "IA",
+    "descricao": "O TDC FLORIPA 2026 é um evento híbrido. Acompanhe online ou presencial, em FLORIANÓPOLIS, entre os dias 22 a 24 de julho. Inscreva-se!",
+    "id": "a254b452-cdac-4cdc-9c89-c23c62d083a5"
+  }
+]
