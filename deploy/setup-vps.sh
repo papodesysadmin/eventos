@@ -11,7 +11,7 @@ set -e
 # CONFIGURAÇÃO — Edite antes de rodar
 # ---------------------------------------------------------------------------
 DOMINIO="eventos.papodesysadmin.com.br"   # Seu domínio (ou IP da VPS)
-REPO_URL="https://github.com/seu-usuario/eventos.git"  # URL do repositório
+REPO_URL="https://github.com/papodesysadmin/eventos.git"  # URL do repositório
 EMAIL_CERTBOT="seu-email@exemplo.com"     # Email para Let's Encrypt
 SITE_DIR="/var/www/eventos"
 NGINX_CONF="/etc/nginx/sites-available/eventos"
