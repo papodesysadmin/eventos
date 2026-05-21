@@ -10,7 +10,7 @@ set -e
 # ---------------------------------------------------------------------------
 # CONFIGURAÇÃO — Edite antes de rodar
 # ---------------------------------------------------------------------------
-DOMINIO="eventos.papodesysadmin.com.br"   # Seu domínio (ou IP da VPS)
+DOMINIO="eventos.papodesysadmin.org"   # Seu domínio (ou IP da VPS)
 REPO_URL="https://github.com/papodesysadmin/eventos.git"  # URL do repositório
 EMAIL_CERTBOT="seu-email@exemplo.com"     # Email para Let's Encrypt
 SITE_DIR="/var/www/eventos"
