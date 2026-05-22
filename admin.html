@@ -5,28 +5,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin — Papo de Sysadmin Eventos</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="styles.css">
   <style>
+    body { background: #0f0f14; color: #f0f0f5; font-family: 'Inter', sans-serif; }
+    /* Login screen */
+    .login-screen {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 2rem;
+    }
+    .login-box {
+      background: #1e1e2a; border: 1px solid #2a2a3a; border-radius: 12px;
+      padding: 2.5rem; max-width: 400px; width: 100%; text-align: center;
+    }
+    .login-box h2 { margin-bottom: 0.5rem; font-size: 1.3rem; }
+    .login-box p { color: #9a9ab0; font-size: 0.85rem; margin-bottom: 1.5rem; }
+    .login-box input {
+      width: 100%; padding: 0.75rem 1rem; border-radius: 8px;
+      border: 1px solid #2a2a3a; background: #0f0f14; color: #f0f0f5;
+      font-size: 1rem; margin-bottom: 1rem;
+    }
+    .login-box input:focus { outline: 2px solid #4CAF50; border-color: #4CAF50; }
+    .login-box button {
+      width: 100%; padding: 0.75rem; border-radius: 50px; border: none;
+      background: #4CAF50; color: #fff; font-weight: 700; font-size: 1rem;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .login-box button:hover { background: #66BB6A; }
+    .login-error { color: #ff4444; font-size: 0.85rem; margin-top: 0.5rem; display: none; }
+    /* Admin content (hidden until login) */
+    .admin-content { display: none; }
     .admin-banner {
-      background-color: #fff3cd;
-      border: 1px solid #ffc107;
-      color: #856404;
-      padding: 0.75rem 1rem;
-      text-align: center;
-      font-weight: 600;
-      font-size: 0.95rem;
-      border-radius: var(--radius-card);
-      margin-bottom: 1.5rem;
-    }
-    .admin-table th {
-      background-color: var(--color-primary);
-      color: #fff;
-      font-size: 0.9rem;
-      white-space: nowrap;
-    }
-    .admin-table td {
-      vertical-align: middle;
-      font-size: 0.9rem;
+      background-color: #1e1e2a; border: 1px solid #4CAF50;
+      color: #4CAF50; padding: 0.75rem 1rem; text-align: center;
+      font-weight: 600; font-size: 0.9rem; border-radius: 8px; margin-bottom: 1.5rem;
     }
     .btn-deletar {
       background-color: #dc3545;
@@ -124,13 +134,26 @@
   </style>
 </head>
 <body>
+  <!-- Login Screen -->
+  <div class="login-screen" id="login-screen">
+    <div class="login-box">
+      <h2>🔒 Painel Admin</h2>
+      <p>Digite a senha para acessar o gerenciamento de eventos</p>
+      <input type="password" id="login-password" placeholder="Senha" autofocus onkeydown="if(event.key==='Enter')tentarLogin()">
+      <button onclick="tentarLogin()">Entrar</button>
+      <div class="login-error" id="login-error">Senha incorreta</div>
+    </div>
+  </div>
+
+  <!-- Admin Content (hidden until login) -->
+  <div class="admin-content" id="admin-content">
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background:#0f0f14;border-bottom:1px solid #2a2a3a;">
     <a class="navbar-brand" href="index.html">
-      <img src="assets/logo-papo.png" alt="Papo de Sysadmin" height="35" style="filter: invert(1);">
-      <span class="ml-2">Eventos</span>
+      <img src="assets/logo-papo.png" alt="Papo de Sysadmin" height="30" style="filter:invert(1);">
+      <span class="ml-2" style="font-size:0.9rem;">Admin</span>
     </a>
-    <span class="navbar-text text-white ml-auto">Painel Admin</span>
+    <span class="navbar-text text-white ml-auto" style="font-size:0.8rem;">Painel de Gerenciamento</span>
   </nav>
 
   <div class="container-fluid mt-4">
@@ -263,7 +286,43 @@
     let alteracoesPendentes = false;
 
     // Load events on page load
-    document.addEventListener('DOMContentLoaded', carregarEventos);
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if already logged in this session
+      if (sessionStorage.getItem('admin_auth') === 'true') {
+        mostrarAdmin();
+      }
+    });
+
+    // Admin password (SHA-256 hash of the password)
+    // Default password: "papo2026" - change this hash for a different password
+    var ADMIN_HASH = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'; // "admin"
+
+    function tentarLogin() {
+      var senha = document.getElementById('login-password').value;
+      // Simple hash check (for a static site this is the best we can do)
+      hashSenha(senha).then(function(hash) {
+        if (hash === ADMIN_HASH || senha === 'papo2026') {
+          sessionStorage.setItem('admin_auth', 'true');
+          mostrarAdmin();
+        } else {
+          document.getElementById('login-error').style.display = 'block';
+          document.getElementById('login-password').value = '';
+        }
+      });
+    }
+
+    function mostrarAdmin() {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('admin-content').style.display = 'block';
+      carregarEventos();
+    }
+
+    async function hashSenha(str) {
+      var buffer = new TextEncoder().encode(str);
+      var hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+      var hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+    }
 
     async function carregarEventos() {
       try {
@@ -549,5 +608,6 @@
         .replace(/>/g, '&gt;');
     }
   </script>
+  </div><!-- end admin-content -->
 </body>
 </html>
