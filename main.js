@@ -4,7 +4,8 @@ const app = (function () {
   const MONTH_NAMES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
   const MONTH_SHORT = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
-  const WEEKDAYS = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+  const WEEKDAYS = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+  const WEEKDAYS_SHORT = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 
   const CATEGORIES = {
     'Cloud': { name: 'Cloud', color: '#e34000' },
@@ -27,14 +28,13 @@ const app = (function () {
   let activeCategory = null;
   let presenceOnly = false;
   let currentView = 'calendar';
-  let currentMonth = new Date().getMonth();
+  let currentMonth = 0;
   let currentYear = 2026;
 
   function init() {
     buildCategoryFilters();
     bindViewToggle();
     bindCalendarNav();
-    bindModal();
     document.getElementById('presence-filter').addEventListener('change', function () {
       presenceOnly = this.checked;
       render();
@@ -52,7 +52,6 @@ const app = (function () {
       if (events.length === 0) { showNotice('Nenhum evento disponível no momento.'); return; }
       allEvents = sortEvents(events);
       updateStats();
-      // Set initial month to first event month
       var firstDate = parseDate(allEvents[0].dataInicio);
       if (firstDate) { currentMonth = firstDate.getUTCMonth(); currentYear = firstDate.getUTCFullYear(); }
       render();
@@ -71,8 +70,7 @@ const app = (function () {
 
   function updateStats() {
     document.getElementById('total-count').textContent = allEvents.length;
-    var pCount = allEvents.filter(function (e) { return e.presenca && e.presenca.confirmada; }).length;
-    document.getElementById('presenca-count').textContent = pCount;
+    document.getElementById('presenca-count').textContent = allEvents.filter(function (e) { return e.presenca && e.presenca.confirmada; }).length;
   }
 
   function buildCategoryFilters() {
@@ -85,61 +83,46 @@ const app = (function () {
 
   function createPill(label, key, isActive) {
     var el = document.createElement('button');
-    el.className = 'filter-pill' + (isActive ? ' active' : '');
+    el.className = 'px-3 py-1 rounded-full text-xs font-medium border transition-all whitespace-nowrap ' +
+      (isActive ? 'bg-accent text-white border-accent' : 'bg-dark-700 text-gray-400 border-dark-500 hover:border-accent hover:text-white');
     el.textContent = label;
     el.addEventListener('click', function () {
-      document.querySelectorAll('.filter-pill').forEach(function (p) { p.classList.remove('active'); });
-      el.classList.add('active');
+      container.querySelectorAll('button').forEach(function (b) {
+        b.className = 'px-3 py-1 rounded-full text-xs font-medium border transition-all whitespace-nowrap bg-dark-700 text-gray-400 border-dark-500 hover:border-accent hover:text-white';
+      });
+      el.className = 'px-3 py-1 rounded-full text-xs font-medium border transition-all whitespace-nowrap bg-accent text-white border-accent';
       activeCategory = key;
       render();
     });
+    var container = document.getElementById('category-filters');
     return el;
   }
 
   function bindViewToggle() {
     document.querySelectorAll('.view-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        document.querySelectorAll('.view-btn').forEach(function (b) { b.classList.remove('active'); });
-        btn.classList.add('active');
+        document.querySelectorAll('.view-btn').forEach(function (b) {
+          b.classList.remove('active', 'bg-accent', 'text-white');
+          b.classList.add('text-gray-400');
+        });
+        btn.classList.add('active', 'bg-accent', 'text-white');
+        btn.classList.remove('text-gray-400');
         currentView = btn.dataset.view;
         document.getElementById('calendar-nav').style.display = currentView === 'calendar' ? '' : 'none';
         render();
       });
     });
+    // Set initial active state
+    document.querySelector('.view-btn.active').classList.add('bg-accent', 'text-white');
   }
 
   function bindCalendarNav() {
     document.getElementById('prev-month').addEventListener('click', function () {
-      currentMonth--;
-      if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-      render();
+      currentMonth--; if (currentMonth < 0) { currentMonth = 11; currentYear--; } render();
     });
     document.getElementById('next-month').addEventListener('click', function () {
-      currentMonth++;
-      if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-      render();
+      currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; } render();
     });
-  }
-
-  function bindModal() {
-    document.getElementById('modal-overlay').addEventListener('click', function (e) {
-      if (e.target === this) this.style.display = 'none';
-    });
-  }
-
-  function showEventModal(event) {
-    var cat = CATEGORIES[event.categoria] || { name: 'Geral', color: '#a14360' };
-    var hasPresence = event.presenca && event.presenca.confirmada;
-    var html = '<h3>' + escapeHtml(event.nome) + '</h3>';
-    html += '<div class="modal-meta"><span class="category-badge" style="background:' + cat.color + '">' + cat.name + '</span>';
-    if (hasPresence) html += ' <span class="presence-badge">🎯 ' + escapeHtml(event.presenca.tipo) + '</span>';
-    html += '</div>';
-    html += '<div class="modal-meta">📅 ' + formatDateRange(event.dataInicio, event.dataFim) + '</div>';
-    html += '<div class="modal-meta">📍 ' + escapeHtml(event.local) + ' — ' + escapeHtml(event.cidade) + ', ' + escapeHtml(event.estado) + '</div>';
-    if (event.descricao) html += '<p class="modal-desc">' + escapeHtml(event.descricao) + '</p>';
-    if (event.url) html += '<a href="' + escapeHtml(event.url) + '" target="_blank" rel="noopener" class="modal-link">🔗 Site do Evento →</a>';
-    document.getElementById('modal-content').innerHTML = html;
-    document.getElementById('modal-overlay').style.display = 'flex';
   }
 
   function getFilteredEvents() {
@@ -151,8 +134,7 @@ const app = (function () {
   }
 
   function render() {
-    var notice = document.getElementById('notice');
-    notice.textContent = '';
+    document.getElementById('notice').textContent = '';
     if (currentView === 'calendar') renderCalendar();
     else renderList();
   }
@@ -163,63 +145,74 @@ const app = (function () {
     var container = document.getElementById('events-container');
     var filtered = getFilteredEvents();
 
-    // Get events for current month
     var monthEvents = filtered.filter(function (e) {
       var d = parseDate(e.dataInicio);
       return d && d.getUTCMonth() === currentMonth && d.getUTCFullYear() === currentYear;
     });
 
-    // Build calendar grid
     var firstDay = new Date(Date.UTC(currentYear, currentMonth, 1));
     var lastDay = new Date(Date.UTC(currentYear, currentMonth + 1, 0));
-    var startDow = (firstDay.getUTCDay() + 6) % 7; // Monday = 0
+    var startDow = (firstDay.getUTCDay() + 6) % 7;
     var daysInMonth = lastDay.getUTCDate();
 
-    var html = '<div class="calendar-grid">';
-    // Headers
-    WEEKDAYS.forEach(function (d) { html += '<div class="cal-header">' + d + '</div>'; });
+    var html = '<div class="grid grid-cols-7 border border-dark-500 rounded-xl overflow-hidden">';
 
-    // Empty cells before first day
+    // Weekday headers
+    WEEKDAYS.forEach(function (d, i) {
+      html += '<div class="bg-accent/90 text-white text-center py-3 text-xs md:text-sm font-bold uppercase tracking-wide">';
+      html += '<span class="hidden md:inline">' + d + '</span>';
+      html += '<span class="md:hidden">' + WEEKDAYS_SHORT[i] + '</span>';
+      html += '</div>';
+    });
+
+    // Empty cells before
     for (var i = 0; i < startDow; i++) {
-      html += '<div class="cal-day other-month"></div>';
+      html += '<div class="cal-cell bg-dark-900/50 border border-dark-500/50 p-1"></div>';
     }
 
     // Days
-    var today = new Date();
     for (var day = 1; day <= daysInMonth; day++) {
-      var isToday = (day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear());
-      html += '<div class="cal-day' + (isToday ? ' today' : '') + '">';
-      html += '<div class="cal-day-number">' + day + '</div>';
-
-      // Events on this day
       var dayEvents = monthEvents.filter(function (e) {
         var d = parseDate(e.dataInicio);
         return d && d.getUTCDate() === day;
       });
 
+      var hasEvents = dayEvents.length > 0;
+      html += '<div class="cal-cell border border-dark-500/50 p-1.5 relative ' +
+        (hasEvents ? 'bg-dark-700 hover:bg-dark-600' : 'bg-dark-800') + ' transition-colors">';
+
+      // Day number
+      html += '<div class="text-xs font-semibold text-gray-500 mb-1">' + day + '</div>';
+
+      // Events
       dayEvents.forEach(function (e) {
         var cat = CATEGORIES[e.categoria] || { name: 'Geral', color: '#a14360' };
         var hasP = e.presenca && e.presenca.confirmada;
-        html += '<div class="cal-event' + (hasP ? ' has-presence' : '') + '" style="background:' + cat.color + '" data-event-id="' + escapeHtml(e.id) + '" onclick="app.openEvent(\'' + escapeHtml(e.id) + '\')">';
-        html += escapeHtml(e.nome.length > 18 ? e.nome.substring(0, 16) + '…' : e.nome);
+        html += '<div class="event-chip rounded px-1.5 py-0.5 mb-0.5 text-[10px] md:text-xs font-bold text-white cursor-pointer truncate hover:opacity-90 transition-opacity' +
+          (hasP ? ' ring-2 ring-presence' : '') + '" ' +
+          'style="background:' + cat.color + '" ' +
+          'onclick="app.openEvent(\'' + esc(e.id) + '\')" ' +
+          'title="' + esc(e.nome) + '">';
+        html += esc(e.nome);
         html += '</div>';
       });
 
       html += '</div>';
     }
 
-    // Empty cells after last day
+    // Empty cells after
     var totalCells = startDow + daysInMonth;
     var remaining = (7 - (totalCells % 7)) % 7;
     for (var j = 0; j < remaining; j++) {
-      html += '<div class="cal-day other-month"></div>';
+      html += '<div class="cal-cell bg-dark-900/50 border border-dark-500/50 p-1"></div>';
     }
 
     html += '</div>';
 
-    // Show count
     if (monthEvents.length === 0) {
-      html += '<p class="notice">Nenhum evento neste mês.</p>';
+      html += '<p class="text-center text-gray-500 py-6">Nenhum evento neste mês</p>';
+    } else {
+      html += '<p class="text-center text-gray-500 text-sm py-3">' + monthEvents.length + ' evento' + (monthEvents.length > 1 ? 's' : '') + ' em ' + MONTH_NAMES[currentMonth] + '</p>';
     }
 
     container.innerHTML = html;
@@ -251,46 +244,78 @@ const app = (function () {
       var monthName = monthIndex >= 0 ? MONTH_NAMES[monthIndex] : 'Indefinido';
       var events = groups[key];
 
-      html += '<div class="month-group"><div class="month-header">';
-      html += '<span class="month-name">' + monthName + '</span>';
-      html += '<span class="month-count">' + events.length + ' evento' + (events.length > 1 ? 's' : '') + '</span>';
-      html += '</div><div class="events-grid">';
+      html += '<div class="mb-8">';
+      html += '<div class="flex items-center gap-3 mb-3 pb-2 border-b border-dark-500">';
+      html += '<h3 class="text-xl font-bold">' + monthName + '</h3>';
+      html += '<span class="bg-dark-700 text-gray-400 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-dark-500">' + events.length + ' evento' + (events.length > 1 ? 's' : '') + '</span>';
+      html += '</div><div class="space-y-3">';
 
-      events.forEach(function (event) { html += renderEventCard(event); });
+      events.forEach(function (event) {
+        var date = parseDate(event.dataInicio);
+        var cat = CATEGORIES[event.categoria] || { name: 'Geral', color: '#a14360' };
+        var hasP = event.presenca && event.presenca.confirmada;
+
+        html += '<div class="bg-dark-700 border border-dark-500 rounded-xl p-4 flex gap-4 items-center hover:border-accent hover:bg-dark-600 transition-all' + (hasP ? ' border-l-4 border-l-presence' : '') + '">';
+
+        // Date
+        html += '<div class="text-center bg-dark-800 rounded-lg px-3 py-2 min-w-[56px]">';
+        if (date) {
+          html += '<div class="text-xl font-extrabold leading-none">' + date.getUTCDate() + '</div>';
+          html += '<div class="text-[10px] font-bold text-accent uppercase mt-0.5">' + MONTH_SHORT[date.getUTCMonth()] + '</div>';
+        }
+        html += '</div>';
+
+        // Info
+        html += '<div class="flex-1 min-w-0">';
+        html += '<div class="flex items-center gap-2 flex-wrap mb-1">';
+        html += '<span class="font-bold text-sm truncate">' + esc(event.nome) + '</span>';
+        html += '<span class="text-[10px] font-semibold px-2 py-0.5 rounded-full text-white" style="background:' + cat.color + '">' + cat.name + '</span>';
+        if (hasP) html += '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-presence text-white">🎯 ' + esc(event.presenca.tipo) + '</span>';
+        html += '</div>';
+        html += '<div class="flex flex-wrap gap-3 text-xs text-gray-400">';
+        html += '<span>📅 ' + formatDateRange(event.dataInicio, event.dataFim) + '</span>';
+        html += '<span>📍 ' + esc(event.cidade) + ', ' + esc(event.estado) + '</span>';
+        html += '</div>';
+        if (event.descricao) html += '<p class="text-xs text-gray-500 mt-1 line-clamp-1">' + esc(event.descricao) + '</p>';
+        html += '</div>';
+
+        // Link
+        if (event.url) {
+          html += '<a href="' + esc(event.url) + '" target="_blank" rel="noopener" class="w-9 h-9 rounded-full bg-dark-800 border border-dark-500 flex items-center justify-center text-gray-400 hover:bg-accent hover:border-accent hover:text-white transition-all shrink-0">';
+          html += '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>';
+          html += '</a>';
+        }
+        html += '</div>';
+      });
+
       html += '</div></div>';
     });
 
     container.innerHTML = html;
   }
 
-  function renderEventCard(event) {
-    var date = parseDate(event.dataInicio);
+  function openEvent(id) {
+    var event = allEvents.find(function (e) { return e.id === id; });
+    if (!event) return;
     var cat = CATEGORIES[event.categoria] || { name: 'Geral', color: '#a14360' };
     var hasP = event.presenca && event.presenca.confirmada;
 
-    var card = '<div class="event-card' + (hasP ? ' has-presence' : '') + '">';
-    card += '<div class="event-date">';
-    if (date) { card += '<span class="day">' + date.getUTCDate() + '</span><span class="month">' + MONTH_SHORT[date.getUTCMonth()] + '</span>'; }
-    else { card += '<span class="day">--</span><span class="month">---</span>'; }
-    card += '</div><div class="event-info"><div class="event-title"><span>' + escapeHtml(event.nome) + '</span>';
-    card += '<span class="category-badge" style="background:' + cat.color + '">' + cat.name + '</span>';
-    if (hasP) card += '<span class="presence-badge">🎯 ' + escapeHtml(event.presenca.tipo) + '</span>';
-    card += '</div><div class="event-meta">';
-    card += '<span class="event-meta-item"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>' + formatDateRange(event.dataInicio, event.dataFim) + '</span>';
-    card += '<span class="event-meta-item"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>' + escapeHtml(event.cidade) + ', ' + escapeHtml(event.estado) + '</span>';
-    card += '</div>';
-    if (event.descricao) card += '<p class="event-description">' + escapeHtml(event.descricao) + '</p>';
-    card += '</div>';
-    if (event.url) {
-      card += '<div class="event-action"><a href="' + escapeHtml(event.url) + '" target="_blank" rel="noopener" class="event-link" title="Site do evento"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg></a></div>';
-    }
-    card += '</div>';
-    return card;
-  }
+    var html = '<div class="space-y-4">';
+    html += '<h3 class="text-xl font-bold">' + esc(event.nome) + '</h3>';
+    html += '<div class="flex flex-wrap gap-2">';
+    html += '<span class="text-xs font-semibold px-2.5 py-1 rounded-full text-white" style="background:' + cat.color + '">' + cat.name + '</span>';
+    if (hasP) html += '<span class="text-xs font-bold px-2.5 py-1 rounded-full bg-presence text-white">🎯 ' + esc(event.presenca.tipo) + '</span>';
+    html += '</div>';
+    html += '<div class="text-sm text-gray-400 space-y-1">';
+    html += '<p>📅 ' + formatDateRange(event.dataInicio, event.dataFim) + '</p>';
+    html += '<p>📍 ' + esc(event.local) + ' — ' + esc(event.cidade) + ', ' + esc(event.estado) + '</p>';
+    html += '</div>';
+    if (event.descricao) html += '<p class="text-sm text-gray-300">' + esc(event.descricao) + '</p>';
+    if (event.url) html += '<a href="' + esc(event.url) + '" target="_blank" rel="noopener" class="inline-block mt-2 text-accent font-semibold text-sm hover:underline">🔗 Site do Evento →</a>';
+    html += '</div>';
 
-  function openEvent(id) {
-    var event = allEvents.find(function (e) { return e.id === id; });
-    if (event) showEventModal(event);
+    document.getElementById('modal-content').innerHTML = html;
+    document.getElementById('modal-overlay').style.display = 'flex';
   }
 
   function formatDateRange(inicio, fim) {
@@ -306,7 +331,7 @@ const app = (function () {
   }
 
   function parseDate(str) { if (!str) return null; var d = new Date(str + 'T00:00:00Z'); return isNaN(d.getTime()) ? null : d; }
-  function escapeHtml(str) { if (!str) return ''; return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'); }
+  function esc(str) { if (!str) return ''; return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'); }
   function showNotice(msg) { document.getElementById('notice').textContent = msg; document.getElementById('events-container').innerHTML = ''; }
 
   return { init: init, openEvent: openEvent };
