@@ -10,7 +10,7 @@
       theme: {
         extend: {
           colors: {
-            dark: { 900: '#0a0a0f', 800: '#0f0f14', 700: '#1a1a24', 600: '#22222e', 500: '#2a2a3a' },
+            brand: { 900: '#1a2030', 800: '#242A38', 700: '#2e3545', 600: '#3a4155', 500: '#4a5168' },
             accent: { DEFAULT: '#4CAF50', light: '#66BB6A' },
             presence: '#FF6B00',
           },
@@ -34,10 +34,10 @@
     .modal-backdrop { backdrop-filter: blur(6px); }
   </style>
 </head>
-<body class="bg-dark-800 text-white font-sans min-h-screen">
+<body class="bg-brand-800 text-white font-sans min-h-screen">
 
   <!-- Header -->
-  <header class="sticky top-0 z-50 bg-dark-900/90 backdrop-blur-md border-b border-dark-500">
+  <header class="sticky top-0 z-50 bg-brand-900/90 backdrop-blur-md border-b border-brand-500">
     <nav class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
       <a href="#" class="flex items-center gap-2">
         <img src="assets/logo-papo.png" alt="Papo de Sysadmin" class="h-9 invert">
@@ -55,7 +55,7 @@
   </header>
 
   <!-- Hero -->
-  <section class="text-center py-12 px-4 bg-gradient-to-b from-dark-700 to-dark-800 border-b border-dark-500">
+  <section class="text-center py-12 px-4 bg-gradient-to-b from-brand-700 to-brand-800 border-b border-brand-500">
     <span class="inline-block bg-accent text-white text-xs font-bold tracking-widest px-4 py-1.5 rounded-full mb-4">CALENDÁRIO 2026</span>
     <h1 class="text-3xl md:text-5xl font-extrabold leading-tight mb-3">Eventos de Tecnologia<br>e Infraestrutura</h1>
     <p class="text-gray-400 text-lg mb-6">Confira onde o Papo de Sysadmin estará presente este ano</p>
@@ -72,9 +72,9 @@
   </section>
 
   <!-- Filters -->
-  <section class="sticky top-[57px] z-40 bg-dark-900/95 backdrop-blur-md border-b border-dark-500 py-3">
+  <section class="sticky top-[57px] z-40 bg-brand-900/95 backdrop-blur-md border-b border-brand-500 py-3">
     <div class="max-w-6xl mx-auto px-4 flex flex-wrap items-center gap-3">
-      <div class="flex gap-1 bg-dark-700 rounded-lg p-1">
+      <div class="flex gap-1 bg-brand-700 rounded-lg p-1">
         <button class="view-btn active px-3 py-1.5 rounded-md text-sm font-medium transition-all" data-view="calendar">📅 Calendário</button>
         <button class="view-btn px-3 py-1.5 rounded-md text-sm font-medium transition-all" data-view="list">📋 Lista</button>
       </div>
@@ -88,11 +88,11 @@
 
   <!-- Calendar Navigation -->
   <div class="max-w-6xl mx-auto px-4 pt-6 pb-2 flex items-center justify-center gap-6" id="calendar-nav">
-    <button id="prev-month" class="w-10 h-10 rounded-full bg-dark-700 border border-dark-500 flex items-center justify-center hover:bg-accent hover:border-accent transition-all text-white">
+    <button id="prev-month" class="w-10 h-10 rounded-full bg-brand-700 border border-brand-500 flex items-center justify-center hover:bg-accent hover:border-accent transition-all text-white">
       <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
     <h2 class="text-2xl font-bold min-w-[220px] text-center" id="cal-month-title">Janeiro 2026</h2>
-    <button id="next-month" class="w-10 h-10 rounded-full bg-dark-700 border border-dark-500 flex items-center justify-center hover:bg-accent hover:border-accent transition-all text-white">
+    <button id="next-month" class="w-10 h-10 rounded-full bg-brand-700 border border-brand-500 flex items-center justify-center hover:bg-accent hover:border-accent transition-all text-white">
       <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
     </button>
   </div>
@@ -105,11 +105,11 @@
 
   <!-- Modal -->
   <div class="fixed inset-0 bg-black/70 modal-backdrop z-[1000] flex items-center justify-center p-4" id="modal-overlay" style="display:none;" onclick="if(event.target===this)this.style.display='none'">
-    <div class="bg-dark-700 border border-dark-500 rounded-xl p-6 max-w-lg w-full max-h-[80vh] overflow-y-auto" id="modal-content"></div>
+    <div class="bg-brand-700 border border-brand-500 rounded-xl p-6 max-w-lg w-full max-h-[80vh] overflow-y-auto" id="modal-content"></div>
   </div>
 
   <!-- Footer -->
-  <footer class="border-t border-dark-500 text-center text-gray-500 text-sm py-6 mt-8">
+  <footer class="border-t border-brand-500 text-center text-gray-500 text-sm py-6 mt-8">
     <p>Papo de Sysadmin — Calendário de Eventos 2026</p>
     <p class="text-xs mt-1">Licenciado sob <a href="http://creativecommons.org/licenses/by-nc/4.0/" class="text-accent hover:underline">CC BY-NC 4.0</a></p>
   </footer>

@@ -84,11 +84,11 @@ const app = (function () {
   function createPill(label, key, isActive) {
     var el = document.createElement('button');
     el.className = 'px-3 py-1 rounded-full text-xs font-medium border transition-all whitespace-nowrap ' +
-      (isActive ? 'bg-accent text-white border-accent' : 'bg-dark-700 text-gray-400 border-dark-500 hover:border-accent hover:text-white');
+      (isActive ? 'bg-accent text-white border-accent' : 'bg-brand-700 text-gray-400 border-brand-500 hover:border-accent hover:text-white');
     el.textContent = label;
     el.addEventListener('click', function () {
       container.querySelectorAll('button').forEach(function (b) {
-        b.className = 'px-3 py-1 rounded-full text-xs font-medium border transition-all whitespace-nowrap bg-dark-700 text-gray-400 border-dark-500 hover:border-accent hover:text-white';
+        b.className = 'px-3 py-1 rounded-full text-xs font-medium border transition-all whitespace-nowrap bg-brand-700 text-gray-400 border-brand-500 hover:border-accent hover:text-white';
       });
       el.className = 'px-3 py-1 rounded-full text-xs font-medium border transition-all whitespace-nowrap bg-accent text-white border-accent';
       activeCategory = key;
@@ -155,7 +155,7 @@ const app = (function () {
     var startDow = (firstDay.getUTCDay() + 6) % 7;
     var daysInMonth = lastDay.getUTCDate();
 
-    var html = '<div class="grid grid-cols-7 border border-dark-500 rounded-xl overflow-hidden">';
+    var html = '<div class="grid grid-cols-7 border border-brand-500 rounded-xl overflow-hidden">';
 
     // Weekday headers
     WEEKDAYS.forEach(function (d, i) {
@@ -167,7 +167,7 @@ const app = (function () {
 
     // Empty cells before
     for (var i = 0; i < startDow; i++) {
-      html += '<div class="cal-cell bg-dark-900/50 border border-dark-500/50 p-1"></div>';
+      html += '<div class="cal-cell bg-brand-900/50 border border-brand-500/50 p-1"></div>';
     }
 
     // Days
@@ -178,8 +178,8 @@ const app = (function () {
       });
 
       var hasEvents = dayEvents.length > 0;
-      html += '<div class="cal-cell border border-dark-500/50 p-1.5 relative ' +
-        (hasEvents ? 'bg-dark-700 hover:bg-dark-600' : 'bg-dark-800') + ' transition-colors">';
+      html += '<div class="cal-cell border border-brand-500/50 p-1.5 relative ' +
+        (hasEvents ? 'bg-brand-700 hover:bg-brand-600' : 'bg-brand-800') + ' transition-colors">';
 
       // Day number
       html += '<div class="text-xs font-semibold text-gray-500 mb-1">' + day + '</div>';
@@ -204,7 +204,7 @@ const app = (function () {
     var totalCells = startDow + daysInMonth;
     var remaining = (7 - (totalCells % 7)) % 7;
     for (var j = 0; j < remaining; j++) {
-      html += '<div class="cal-cell bg-dark-900/50 border border-dark-500/50 p-1"></div>';
+      html += '<div class="cal-cell bg-brand-900/50 border border-brand-500/50 p-1"></div>';
     }
 
     html += '</div>';
@@ -245,9 +245,9 @@ const app = (function () {
       var events = groups[key];
 
       html += '<div class="mb-8">';
-      html += '<div class="flex items-center gap-3 mb-3 pb-2 border-b border-dark-500">';
+      html += '<div class="flex items-center gap-3 mb-3 pb-2 border-b border-brand-500">';
       html += '<h3 class="text-xl font-bold">' + monthName + '</h3>';
-      html += '<span class="bg-dark-700 text-gray-400 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-dark-500">' + events.length + ' evento' + (events.length > 1 ? 's' : '') + '</span>';
+      html += '<span class="bg-brand-700 text-gray-400 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-brand-500">' + events.length + ' evento' + (events.length > 1 ? 's' : '') + '</span>';
       html += '</div><div class="space-y-3">';
 
       events.forEach(function (event) {
@@ -255,10 +255,10 @@ const app = (function () {
         var cat = CATEGORIES[event.categoria] || { name: 'Geral', color: '#a14360' };
         var hasP = event.presenca && event.presenca.confirmada;
 
-        html += '<div class="bg-dark-700 border border-dark-500 rounded-xl p-4 flex gap-4 items-center hover:border-accent hover:bg-dark-600 transition-all' + (hasP ? ' border-l-4 border-l-presence' : '') + '">';
+        html += '<div class="bg-brand-700 border border-brand-500 rounded-xl p-4 flex gap-4 items-center hover:border-accent hover:bg-brand-600 transition-all' + (hasP ? ' border-l-4 border-l-presence' : '') + '">';
 
         // Date
-        html += '<div class="text-center bg-dark-800 rounded-lg px-3 py-2 min-w-[56px]">';
+        html += '<div class="text-center bg-brand-800 rounded-lg px-3 py-2 min-w-[56px]">';
         if (date) {
           html += '<div class="text-xl font-extrabold leading-none">' + date.getUTCDate() + '</div>';
           html += '<div class="text-[10px] font-bold text-accent uppercase mt-0.5">' + MONTH_SHORT[date.getUTCMonth()] + '</div>';
@@ -281,7 +281,7 @@ const app = (function () {
 
         // Link
         if (event.url) {
-          html += '<a href="' + esc(event.url) + '" target="_blank" rel="noopener" class="w-9 h-9 rounded-full bg-dark-800 border border-dark-500 flex items-center justify-center text-gray-400 hover:bg-accent hover:border-accent hover:text-white transition-all shrink-0">';
+          html += '<a href="' + esc(event.url) + '" target="_blank" rel="noopener" class="w-9 h-9 rounded-full bg-brand-800 border border-brand-500 flex items-center justify-center text-gray-400 hover:bg-accent hover:border-accent hover:text-white transition-all shrink-0">';
           html += '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>';
           html += '</a>';
         }
