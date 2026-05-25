@@ -495,12 +495,12 @@ function extractEventFromJinaContent(content, originalUrl) {
   }
 
   // Extract dates from image alt texts and content
-  // Pattern: "DD e DD de Mês" or "DD a DD de Mês" in image alts or text
-  const datePatterns = content.matchAll(/(\d{1,2})\s*(?:a|e)\s*(\d{1,2})\s+de\s+(\w+)/gi);
+  // Pattern: "DD e DD de Mês" or "DD a DD de Mês" or "De DD à DD de Mês"
+  const datePatterns = content.matchAll(/(?:de\s+)?(\d{1,2})\s*(?:a|à|e)\s*(\d{1,2})\s+de\s+(\w+)/gi);
   for (const match of datePatterns) {
     const monthNum = MONTHS[match[3].toLowerCase()];
     if (monthNum) {
-      const year = content.match(/2026|2025|2027/) ? (content.match(/(2026|2027)/)?.[1] || '2026') : '2026';
+      const year = content.match(/(2026|2027)/) ? (content.match(/(2026|2027)/)?.[1] || '2026') : '2026';
       data.dataInicio = `${year}-${monthNum}-${match[1].padStart(2, '0')}`;
       data.dataFim = `${year}-${monthNum}-${match[2].padStart(2, '0')}`;
       break;
@@ -590,10 +590,26 @@ function extractEventFromJinaContent(content, originalUrl) {
   const required = ['nome', 'dataInicio', 'local', 'cidade', 'estado', 'pais', 'url', 'categoria'];
   const missingFields = required.filter(f => !data[f]);
 
+  // Collect registration/ticket links for potential follow-up extraction
+  const registrationLinks = [];
+  const linkPatterns = content.matchAll(/\[([^\]]*)\]\((https?:\/\/[^)]+)\)/g);
+  for (const match of linkPatterns) {
+    const text = match[1].toLowerCase();
+    const href = match[2];
+    if (text.match(/inscri|ingresso|ticket|comprar|garanti|particip|register/i) ||
+        href.match(/sympla|even3|eventbrite|4\.events|doity|lets\.events|ticket/i)) {
+      registrationLinks.push(href);
+    }
+  }
+  if (registrationLinks.length > 0) {
+    data._registrationLinks = registrationLinks;
+  }
+
   return {
     success: missingFields.length === 0,
     data,
     missingFields,
+    registrationLinks: registrationLinks.length > 0 ? registrationLinks : undefined,
     error: missingFields.length > 0 ? `Campos não encontrados: ${missingFields.join(', ')}` : undefined,
   };
 }
