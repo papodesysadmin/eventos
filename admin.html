@@ -43,10 +43,10 @@
       color: #fff;
       border: none;
       padding: 0.3rem 0.6rem;
-      border-radius: var(--radius-badge);
+      border-radius: 4px;
       font-size: 0.8rem;
       cursor: pointer;
-      transition: background-color var(--transition-fast);
+      transition: background-color 0.2s;
     }
     .btn-deletar:hover { background-color: #c82333; color: #fff; }
     .btn-editar {
@@ -54,70 +54,117 @@
       color: #fff;
       border: none;
       padding: 0.3rem 0.6rem;
-      border-radius: var(--radius-badge);
+      border-radius: 4px;
       font-size: 0.8rem;
       cursor: pointer;
-      transition: background-color var(--transition-fast);
+      transition: background-color 0.2s;
     }
     .btn-editar:hover { background-color: #0056b3; color: #fff; }
     .btn-salvar-global {
-      background-color: var(--color-accent);
+      background-color: #4CAF50;
       color: #fff;
       border: none;
       padding: 0.75rem 1.5rem;
-      border-radius: var(--radius-badge);
+      border-radius: 6px;
       font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
-      transition: background-color var(--transition-fast);
+      transition: background-color 0.2s;
     }
-    .btn-salvar-global:hover { background-color: var(--color-accent-hover); color: #fff; }
+    .btn-salvar-global:hover { background-color: #66BB6A; color: #fff; }
     .save-instructions {
-      background-color: #d4edda;
-      border: 1px solid #c3e6cb;
-      color: #155724;
+      background-color: #1e3a1e;
+      border: 1px solid #4CAF50;
+      color: #a5d6a7;
       padding: 0.75rem 1rem;
-      border-radius: var(--radius-badge);
+      border-radius: 6px;
       margin-top: 0.75rem;
       font-size: 0.9rem;
     }
     .edit-form {
-      background-color: #f8f9fa;
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-card);
+      background-color: #1e1e2a;
+      border: 1px solid #2a2a3a;
+      border-radius: 8px;
       padding: 1rem;
       margin-top: 0.5rem;
     }
     .edit-form label {
       font-size: 0.85rem;
       font-weight: 600;
+      color: #ccc;
       margin-bottom: 0.2rem;
     }
     .edit-form input,
     .edit-form select,
     .edit-form textarea {
       font-size: 0.85rem;
+      background: #0f0f14;
+      color: #f0f0f5;
+      border: 1px solid #2a2a3a;
+    }
+    .edit-form input:focus,
+    .edit-form select:focus {
+      border-color: #4CAF50;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(76,175,80,0.2);
     }
     .add-form {
-      background-color: var(--color-card);
-      border: 2px solid var(--color-accent);
-      border-radius: var(--radius-card);
+      background-color: #1e1e2a;
+      border: 2px solid #4CAF50;
+      border-radius: 8px;
       padding: 1.5rem;
       margin-bottom: 1.5rem;
-      box-shadow: 0 2px 8px var(--color-shadow);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
     .add-form h3 {
-      color: var(--color-accent);
+      color: #4CAF50;
       margin-bottom: 1rem;
+    }
+    .import-form {
+      background-color: #1a1a2e;
+      border: 2px solid #ff9800;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .import-form h3 {
+      color: #ff9800;
+      margin-bottom: 1rem;
+    }
+    .import-status {
+      margin-top: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      display: none;
+    }
+    .import-status.loading {
+      display: block;
+      background: #1a2a3a;
+      border: 1px solid #2196F3;
+      color: #90caf9;
+    }
+    .import-status.success {
+      display: block;
+      background: #1e3a1e;
+      border: 1px solid #4CAF50;
+      color: #a5d6a7;
+    }
+    .import-status.error {
+      display: block;
+      background: #3a1e1e;
+      border: 1px solid #f44336;
+      color: #ef9a9a;
     }
     .badge-presenca-tipo {
       display: inline-block;
-      background-color: var(--color-accent);
+      background-color: #4CAF50;
       color: #fff;
       font-size: 0.75rem;
       font-weight: 600;
       padding: 0.15rem 0.4rem;
-      border-radius: var(--radius-badge);
+      border-radius: 4px;
       text-transform: capitalize;
     }
     .changes-pending {
@@ -125,11 +172,39 @@
       bottom: 1rem;
       right: 1rem;
       z-index: 1050;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-      border-radius: var(--radius-card);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+      border-radius: 8px;
       padding: 1rem 1.5rem;
-      background-color: var(--color-card);
-      border: 2px solid var(--color-accent);
+      background-color: #1e1e2a;
+      border: 2px solid #4CAF50;
+    }
+    .admin-table {
+      color: #f0f0f5;
+    }
+    .admin-table th {
+      background: #1e1e2a;
+      color: #9a9ab0;
+      border-color: #2a2a3a;
+    }
+    .admin-table td {
+      border-color: #2a2a3a;
+      vertical-align: middle;
+    }
+    .btn-import {
+      background-color: #ff9800;
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .btn-import:hover { background-color: #ffa726; color: #fff; }
+    .btn-import:disabled {
+      background-color: #555;
+      cursor: not-allowed;
     }
   </style>
 </head>
@@ -160,6 +235,34 @@
     <!-- Banner de aviso -->
     <div class="admin-banner">
       ⚠️ Painel Admin Local — As alterações precisam ser salvas manualmente no repositório
+    </div>
+
+    <!-- Importar via URL -->
+    <div class="import-form" id="import-form">
+      <h3>🔗 Importar Evento via URL</h3>
+      <p style="color:#9a9ab0;font-size:0.85rem;margin-bottom:1rem;">Cole a URL do evento e o sistema extrairá automaticamente as informações (nome, data, local, etc.)</p>
+      <form onsubmit="return importarViaUrl(event)">
+        <div class="form-row">
+          <div class="form-group col-md-7">
+            <label for="import-url">URL do Evento *</label>
+            <input type="url" class="form-control" id="import-url" placeholder="https://exemplo.com/evento" required style="background:#0f0f14;color:#f0f0f5;border:1px solid #2a2a3a;">
+          </div>
+          <div class="form-group col-md-3">
+            <label for="import-presenca">Tipo de Presença</label>
+            <select class="form-control" id="import-presenca" style="background:#0f0f14;color:#f0f0f5;border:1px solid #2a2a3a;">
+              <option value="">Nenhuma</option>
+              <option value="palestrante">Palestrante</option>
+              <option value="participante">Participante</option>
+              <option value="organizador">Organizador</option>
+              <option value="midia">Mídia</option>
+            </select>
+          </div>
+          <div class="form-group col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn-import w-100" id="btn-importar">🚀 Extrair</button>
+          </div>
+        </div>
+      </form>
+      <div class="import-status" id="import-status"></div>
     </div>
 
     <!-- Formulário Adicionar Evento -->
@@ -586,6 +689,88 @@
       URL.revokeObjectURL(url);
 
       document.getElementById('save-instructions').style.display = 'block';
+    }
+
+    // ============================================================
+    // IMPORTAÇÃO VIA URL (Extração automática)
+    // ============================================================
+
+    // URL da API de extração (VPS)
+    const EXTRACT_API_URL = 'https://eventos.papodesysadmin.org/api/extract';
+
+    async function importarViaUrl(e) {
+      e.preventDefault();
+
+      const url = document.getElementById('import-url').value.trim();
+      const presencaTipo = document.getElementById('import-presenca').value;
+      const statusEl = document.getElementById('import-status');
+      const btnEl = document.getElementById('btn-importar');
+
+      if (!url) return false;
+
+      // Show loading
+      statusEl.className = 'import-status loading';
+      statusEl.innerHTML = '⏳ Extraindo dados do evento... (pode levar alguns segundos)';
+      btnEl.disabled = true;
+      btnEl.textContent = '⏳ Extraindo...';
+
+      try {
+        const response = await fetch(EXTRACT_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: url }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Erro HTTP ' + response.status);
+        }
+
+        const result = await response.json();
+
+        if (result.data && (result.data.nome || result.data.dataInicio)) {
+          // Preencher o formulário de adição com os dados extraídos
+          preencherFormulario(result.data, presencaTipo);
+
+          const camposPreenchidos = Object.keys(result.data).filter(k => result.data[k]).length;
+          let msg = '✅ Dados extraídos com sucesso! (' + camposPreenchidos + ' campos preenchidos)';
+
+          if (result.missingFields && result.missingFields.length > 0) {
+            msg += '<br>⚠️ Campos não encontrados: <strong>' + result.missingFields.join(', ') + '</strong> — preencha manualmente abaixo.';
+          }
+
+          statusEl.className = 'import-status success';
+          statusEl.innerHTML = msg;
+
+          // Scroll para o formulário de adição
+          document.getElementById('add-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          statusEl.className = 'import-status error';
+          statusEl.innerHTML = '❌ ' + (result.error || 'Não foi possível extrair dados desta URL. Tente adicionar manualmente.');
+        }
+      } catch (err) {
+        statusEl.className = 'import-status error';
+        statusEl.innerHTML = '❌ Erro ao conectar com a API de extração: ' + escapeHtml(err.message) +
+          '<br><small>Verifique se o serviço está rodando na VPS.</small>';
+      } finally {
+        btnEl.disabled = false;
+        btnEl.textContent = '🚀 Extrair';
+      }
+
+      return false;
+    }
+
+    function preencherFormulario(data, presencaTipo) {
+      if (data.nome) document.getElementById('add-nome').value = data.nome;
+      if (data.dataInicio) document.getElementById('add-dataInicio').value = data.dataInicio;
+      if (data.dataFim) document.getElementById('add-dataFim').value = data.dataFim;
+      if (data.local) document.getElementById('add-local').value = data.local;
+      if (data.cidade) document.getElementById('add-cidade').value = data.cidade;
+      if (data.estado) document.getElementById('add-estado').value = data.estado;
+      if (data.pais) document.getElementById('add-pais').value = data.pais;
+      if (data.url) document.getElementById('add-url').value = data.url;
+      if (data.categoria) document.getElementById('add-categoria').value = data.categoria;
+      if (data.descricao) document.getElementById('add-descricao').value = data.descricao;
+      if (presencaTipo) document.getElementById('add-presenca-tipo').value = presencaTipo;
     }
 
     function escapeHtml(str) {

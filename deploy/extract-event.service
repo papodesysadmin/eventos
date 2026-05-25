@@ -1,0 +1,15 @@
+[Unit]
+Description=Papo de Sysadmin - Event Extractor API
+After=network.target
+
+[Service]
+Type=simple
+User=linuxmen
+WorkingDirectory=/var/www/eventos/api
+ExecStart=/usr/bin/node /var/www/eventos/api/extract-event.js
+Restart=on-failure
+RestartSec=5
+Environment=EXTRACT_PORT=3002
+
+[Install]
+WantedBy=multi-user.target
