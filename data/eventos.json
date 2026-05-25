@@ -210,6 +210,23 @@
     "descricao": "Conferência de Go/Golang da América Latina"
   },
   {
+    "id": "e5f6a7b8-9c0d-4e1f-2a3b-c4d5e6f7a8b9",
+    "nome": "HackTown 2026",
+    "dataInicio": "2026-09-03",
+    "dataFim": "2026-09-07",
+    "local": "Por toda a cidade",
+    "cidade": "Santa Rita do Sapucaí",
+    "estado": "MG",
+    "pais": "Brasil",
+    "url": "https://hacktown.com.br/",
+    "categoria": "Geral",
+    "descricao": "Festival de tecnologia, inovação, criatividade e consciência no Vale da Eletrônica",
+    "presenca": {
+      "confirmada": true,
+      "tipo": "palestrante"
+    }
+  },
+  {
     "id": "f6a7b8c9-0d1e-4f2a-3b4c-d5e6f7a8b9c0",
     "nome": "TDC Stage Santa Rita do Sapucaí 2026",
     "dataInicio": "2026-09-04",
@@ -274,23 +291,6 @@
     "presenca": {
       "confirmada": true,
       "tipo": "organizador"
-    }
-  },
-  {
-    "id": "e5f6a7b8-9c0d-4e1f-2a3b-c4d5e6f7a8b9",
-    "nome": "HackTown 2026",
-    "dataInicio": "2026-10-30",
-    "dataFim": "2026-11-02",
-    "local": "Centro Histórico",
-    "cidade": "Santa Rita do Sapucaí",
-    "estado": "MG",
-    "pais": "Brasil",
-    "url": "https://hacktown.com.br/",
-    "categoria": "Geral",
-    "descricao": "Festival de inovação, tecnologia e criatividade no sul de Minas Gerais",
-    "presenca": {
-      "confirmada": true,
-      "tipo": "palestrante"
     }
   },
   {
