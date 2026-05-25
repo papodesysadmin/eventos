@@ -540,6 +540,27 @@ function extractEventFromJinaContent(content, originalUrl) {
     }
   }
 
+  // Try pattern: "**Local:**" or "Local:" followed by venue name (markdown)
+  if (!data.local) {
+    const localMatch = content.match(/\*{0,2}Local\*{0,2}\s*:\s*\[?([^\]\n|]+)/i);
+    if (localMatch) {
+      let venue = localMatch[1].trim().replace(/\*+/g, '').replace(/^\[/, '');
+      // Clean up: take only the venue name (before address details like "|" or "–")
+      const dashParts = venue.split(/\s*[|–—]\s*/);
+      if (dashParts[0].length > 3) {
+        data.local = dashParts[0].trim();
+      }
+    }
+  }
+
+  // Try pattern: "Onde:" or "Endereço:" or "Venue:"
+  if (!data.local) {
+    const whereMatch = content.match(/(?:\*{0,2}(?:Onde|Endere[çc]o|Venue|Where|Address)\*{0,2})\s*:\s*\[?([^\]\n|]{3,60})/i);
+    if (whereMatch) {
+      data.local = whereMatch[1].trim().replace(/\*+/g, '');
+    }
+  }
+
   // Try to find city in text patterns: "em Cidade" or "Local: Cidade"
   if (!data.cidade) {
     // Only match known Brazilian cities to avoid false positives
