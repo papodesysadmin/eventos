@@ -264,6 +264,23 @@
     }
   },
   {
+    "id": "e5f6a7b8-9c0d-4e1f-2a3b-c4d5e6f7a8b9",
+    "nome": "HackTown 2026",
+    "dataInicio": "2026-10-30",
+    "dataFim": "2026-11-02",
+    "local": "Centro Histórico",
+    "cidade": "Santa Rita do Sapucaí",
+    "estado": "MG",
+    "pais": "Brasil",
+    "url": "https://hacktown.com.br/",
+    "categoria": "Geral",
+    "descricao": "Festival de inovação, tecnologia e criatividade no sul de Minas Gerais",
+    "presenca": {
+      "confirmada": true,
+      "tipo": "palestrante"
+    }
+  },
+  {
     "id": "a8c3d1e4-5f6b-4a2c-9d7e-b0f1c2d3e4a5",
     "nome": "TDC Experience Recife | Rec'n'Play",
     "dataInicio": "2026-11-11",
