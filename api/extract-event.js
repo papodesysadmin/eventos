@@ -832,6 +832,7 @@ const server = http.createServer(async (req, res) => {
             cwd: '/var/www/eventos',
             timeout: 30000,
             stdio: 'pipe',
+            env: { ...process.env, HOME: '/var/www', GIT_SSH_COMMAND: 'ssh -i /var/www/.ssh/id_ed25519_deploy -o StrictHostKeyChecking=accept-new' },
           });
           console.log('[save] Git push OK');
         } catch (gitErr) {
