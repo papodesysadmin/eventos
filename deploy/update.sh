@@ -37,6 +37,7 @@ fi
 
 # Ajustar permissões
 chown -R www-data:www-data "$SITE_DIR"
+chmod -R 755 "$SITE_DIR"
 
 echo ""
 echo -e "${GREEN}✅ Site atualizado com sucesso!${NC}"
