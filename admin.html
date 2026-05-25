@@ -676,19 +676,41 @@
         return obj;
       });
 
-      const json = JSON.stringify(eventosLimpos, null, 2);
-      const blob = new Blob([json], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
+      const btnSalvar = document.querySelector('#save-panel .btn-salvar-global');
+      btnSalvar.disabled = true;
+      btnSalvar.textContent = '⏳ Salvando...';
 
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'eventos.json';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      document.getElementById('save-instructions').style.display = 'block';
+      fetch('https://eventos.papodesysadmin.org/api/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eventos: eventosLimpos, senha: 'papo2026' }),
+      })
+      .then(function(response) { return response.json(); })
+      .then(function(result) {
+        if (result.success) {
+          document.getElementById('save-instructions').style.display = 'block';
+          document.getElementById('save-instructions').innerHTML =
+            '✅ Salvo com sucesso! <strong>' + result.total + ' eventos</strong> atualizados no servidor e publicados automaticamente.';
+          alteracoesPendentes = false;
+        } else {
+          document.getElementById('save-instructions').style.display = 'block';
+          document.getElementById('save-instructions').innerHTML =
+            '❌ Erro ao salvar: ' + (result.error || 'Erro desconhecido');
+          document.getElementById('save-instructions').style.borderColor = '#f44336';
+          document.getElementById('save-instructions').style.color = '#ef9a9a';
+        }
+      })
+      .catch(function(err) {
+        document.getElementById('save-instructions').style.display = 'block';
+        document.getElementById('save-instructions').innerHTML =
+          '❌ Erro de conexão: ' + err.message;
+        document.getElementById('save-instructions').style.borderColor = '#f44336';
+        document.getElementById('save-instructions').style.color = '#ef9a9a';
+      })
+      .finally(function() {
+        btnSalvar.disabled = false;
+        btnSalvar.textContent = '💾 Salvar Alterações';
+      });
     }
 
     // ============================================================

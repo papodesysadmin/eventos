@@ -791,7 +791,70 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  if (req.method !== 'POST' || req.url !== '/extract') {
+  if (req.method !== 'POST') {
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Not found' }));
+    return;
+  }
+
+  // Route: POST /save — salva eventos.json e faz git commit+push
+  if (req.url === '/save') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      try {
+        const { eventos, senha } = JSON.parse(body);
+        
+        // Auth simples (mesma senha do admin)
+        if (senha !== 'papo2026') {
+          res.writeHead(401, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Não autorizado' }));
+          return;
+        }
+
+        if (!Array.isArray(eventos)) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Dados inválidos' }));
+          return;
+        }
+
+        const fs = require('fs');
+        const { execSync } = require('child_process');
+        const filePath = '/var/www/eventos/data/eventos.json';
+
+        // Salvar arquivo
+        fs.writeFileSync(filePath, JSON.stringify(eventos, null, 2), 'utf8');
+        console.log(`[save] Saved ${eventos.length} events to ${filePath}`);
+
+        // Git commit + push
+        try {
+          execSync('git add data/eventos.json && git commit -m "admin: atualizar eventos via painel" && git push origin main', {
+            cwd: '/var/www/eventos',
+            timeout: 30000,
+            stdio: 'pipe',
+          });
+          console.log('[save] Git push OK');
+        } catch (gitErr) {
+          // Se não tem mudança, git commit falha — tudo bem
+          const msg = gitErr.stderr ? gitErr.stderr.toString() : gitErr.message;
+          if (!msg.includes('nothing to commit')) {
+            console.error('[save] Git error:', msg);
+          }
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, total: eventos.length }));
+      } catch (err) {
+        console.error('[save] Error:', err.message);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Route: POST /extract
+  if (req.url !== '/extract') {
     res.writeHead(404, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Not found' }));
     return;
