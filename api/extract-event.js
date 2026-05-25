@@ -390,9 +390,43 @@ function extractEventData(html, originalUrl) {
 }
 
 // ============================================================
-// HTTP FETCH
+// HTTP FETCH (com Jina Reader como método principal)
 // ============================================================
 
+/**
+ * Fetch via Jina Reader (renderiza JS, retorna markdown limpo)
+ */
+function fetchViaJina(url) {
+  return new Promise((resolve, reject) => {
+    const jinaUrl = `https://r.jina.ai/${url}`;
+    const req = https.request({
+      hostname: 'r.jina.ai',
+      path: '/' + url,
+      method: 'GET',
+      headers: {
+        'Accept': 'text/plain',
+        'X-No-Cache': 'true',
+      },
+      timeout: 30000,
+    }, (res) => {
+      if (res.statusCode !== 200) {
+        reject(new Error(`Jina HTTP ${res.statusCode}`));
+        return;
+      }
+      let data = '';
+      res.setEncoding('utf8');
+      res.on('data', chunk => { data += chunk; });
+      res.on('end', () => resolve(data));
+    });
+    req.on('error', reject);
+    req.on('timeout', () => { req.destroy(); reject(new Error('Jina timeout: 30s')); });
+    req.end();
+  });
+}
+
+/**
+ * Fetch direto (HTML cru, para sites estáticos e GitHub raw)
+ */
 function fetchUrl(url) {
   return new Promise((resolve, reject) => {
     const parsedUrl = new URL(url);
@@ -436,6 +470,132 @@ function fetchUrl(url) {
     req.on('timeout', () => { req.destroy(); reject(new Error('Timeout: 30s')); });
     req.end();
   });
+}
+
+// ============================================================
+// EXTRACTION FROM JINA READER CONTENT (markdown/text)
+// ============================================================
+
+/**
+ * Extract event data from Jina Reader markdown output.
+ * Jina returns clean text with title, image alt texts, links, etc.
+ */
+function extractEventFromJinaContent(content, originalUrl) {
+  const data = {};
+  const lines = content.split('\n');
+
+  // Extract title from "Title: ..." line or first # heading
+  const titleLine = lines.find(l => l.startsWith('Title:'));
+  if (titleLine) {
+    data.nome = titleLine.replace('Title:', '').trim();
+  }
+  if (!data.nome) {
+    const h1 = lines.find(l => l.startsWith('# '));
+    if (h1) data.nome = h1.replace(/^#+\s*/, '').trim();
+  }
+
+  // Extract dates from image alt texts and content
+  // Pattern: "DD e DD de Mês" or "DD a DD de Mês" in image alts or text
+  const datePatterns = content.matchAll(/(\d{1,2})\s*(?:a|e)\s*(\d{1,2})\s+de\s+(\w+)/gi);
+  for (const match of datePatterns) {
+    const monthNum = MONTHS[match[3].toLowerCase()];
+    if (monthNum) {
+      const year = content.match(/2026|2025|2027/) ? (content.match(/(2026|2027)/)?.[1] || '2026') : '2026';
+      data.dataInicio = `${year}-${monthNum}-${match[1].padStart(2, '0')}`;
+      data.dataFim = `${year}-${monthNum}-${match[2].padStart(2, '0')}`;
+      break;
+    }
+  }
+
+  // Single date: "DD de Mês"
+  if (!data.dataInicio) {
+    const singleDate = content.match(/(\d{1,2})\s+de\s+(\w+)\s+(?:de\s+)?(\d{4})/i);
+    if (singleDate && MONTHS[singleDate[2].toLowerCase()]) {
+      data.dataInicio = `${singleDate[3]}-${MONTHS[singleDate[2].toLowerCase()]}-${singleDate[1].padStart(2, '0')}`;
+    }
+  }
+
+  // ISO dates
+  if (!data.dataInicio) {
+    const isoDate = content.match(/(\d{4}-\d{2}-\d{2})/);
+    if (isoDate) data.dataInicio = isoDate[1];
+  }
+
+  // Extract city/location from image alts like "![Image N: Cidade]"
+  const cityImages = content.matchAll(/!\[Image \d+:\s*([^\]]+)\]\([^)]*cidade[^)]*\)/gi);
+  for (const match of cityImages) {
+    const city = match[1].trim();
+    if (city && city.length < 40 && !city.includes('http')) {
+      data.cidade = city;
+      break;
+    }
+  }
+
+  // Try pattern: "Local - Cidade DD a DD de Mês" (TDC style)
+  if (!data.cidade) {
+    const locCityMatch = content.match(/([A-ZÀ-Ú][^\n]{2,30})\s*-\s*([A-ZÀ-Ú][a-zà-ú]+(?:\s+(?:de|do|da)\s+[A-ZÀ-Ú][a-zà-ú]+)?)\s+\d{1,2}\s+(?:a|e)\s+\d{1,2}\s+de\s+\w+/);
+    if (locCityMatch) {
+      data.local = locCityMatch[1].trim();
+      data.cidade = locCityMatch[2].trim();
+    }
+  }
+
+  // Try to find city in text patterns: "em Cidade" or "Local: Cidade"
+  if (!data.cidade) {
+    // Only match known Brazilian cities to avoid false positives
+    const knownCities = [
+      'São Paulo', 'Rio de Janeiro', 'Florianópolis', 'Belo Horizonte', 'Porto Alegre',
+      'Curitiba', 'Brasília', 'Recife', 'Salvador', 'Fortaleza', 'Manaus', 'Goiânia',
+      'Campinas', 'Joinville', 'Londrina', 'Natal', 'Maringá', 'Santa Rita do Sapucaí',
+      'Foz do Iguaçu', 'São Carlos', 'Pinhais', 'Guarulhos',
+    ];
+    for (const city of knownCities) {
+      if (content.includes(city)) {
+        data.cidade = city;
+        break;
+      }
+    }
+  }
+
+  // Extract description from meta or first meaningful paragraph
+  const descLine = lines.find(l => l.length > 30 && l.length < 250 && !l.startsWith('!') && !l.startsWith('[') && !l.startsWith('#') && !l.startsWith('*') && !l.startsWith('Title:') && !l.startsWith('URL Source:') && !l.includes('cookie') && !l.includes('WhatsApp') && !l.includes('preencha'));
+  if (descLine) {
+    data.descricao = descLine.trim().substring(0, 200);
+  }
+
+  // URL
+  data.url = originalUrl;
+
+  // Infer category
+  data.categoria = inferCategory([data.nome, data.descricao].filter(Boolean).join(' '));
+
+  // Default country
+  if (!data.pais) data.pais = 'Brasil';
+
+  // Infer state from city
+  if (data.cidade && !data.estado) {
+    const cityStateMap = {
+      'florianópolis': 'SC', 'florianopolis': 'SC', 'são paulo': 'SP', 'sao paulo': 'SP',
+      'rio de janeiro': 'RJ', 'belo horizonte': 'MG', 'porto alegre': 'RS',
+      'curitiba': 'PR', 'brasília': 'DF', 'brasilia': 'DF', 'recife': 'PE',
+      'salvador': 'BA', 'fortaleza': 'CE', 'manaus': 'AM', 'goiânia': 'GO',
+      'campinas': 'SP', 'joinville': 'SC', 'londrina': 'PR', 'natal': 'RN',
+      'maringá': 'PR', 'maringa': 'PR', 'santa rita do sapucaí': 'MG',
+      'foz do iguaçu': 'PR', 'são carlos': 'SP', 'pinhais': 'PR',
+    };
+    data.estado = cityStateMap[data.cidade.toLowerCase()] || null;
+  }
+
+  // Check required fields
+  const required = ['nome', 'dataInicio', 'local', 'cidade', 'estado', 'pais', 'url', 'categoria'];
+  const missingFields = required.filter(f => !data[f]);
+
+  return {
+    success: missingFields.length === 0,
+    data,
+    missingFields,
+    error: missingFields.length > 0 ? `Campos não encontrados: ${missingFields.join(', ')}` : undefined,
+  };
 }
 
 // ============================================================
@@ -613,32 +773,53 @@ const server = http.createServer(async (req, res) => {
 
       console.log(`[extract] Fetching: ${url}`);
       
-      // Check if it's a GitHub repo URL — fetch README directly
+      // Check if it's a GitHub repo URL — fetch README directly (no Jina needed)
       const rawUrl = getGitHubRawUrl(url);
-      const fetchTarget = rawUrl || url;
       
-      const content = await fetchUrl(fetchTarget);
-
-      // Check if content is a markdown event list
-      if (isMarkdownEventList(content)) {
-        console.log(`[extract] Detected markdown event list`);
-        const events = parseMarkdownEvents(content, url);
-        console.log(`[extract] Parsed ${events.length} events from markdown`);
-        
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ 
-          success: true, 
-          multiple: true, 
-          events: events,
-          total: events.length,
-          source: url,
-        }));
-        return;
+      if (rawUrl) {
+        // GitHub repo: fetch raw markdown directly
+        const content = await fetchUrl(rawUrl);
+        if (isMarkdownEventList(content)) {
+          console.log(`[extract] Detected markdown event list from GitHub`);
+          const events = parseMarkdownEvents(content, url);
+          console.log(`[extract] Parsed ${events.length} events from markdown`);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true, multiple: true, events, total: events.length, source: url }));
+          return;
+        }
       }
 
-      // Single event extraction (HTML)
-      const result = extractEventData(content, url);
-      console.log(`[extract] Result: success=${result.success}, fields=${Object.keys(result.data).length}`);
+      // For all other URLs: use Jina Reader (renders JS, returns clean content)
+      let content;
+      let usedJina = false;
+      try {
+        content = await fetchViaJina(url);
+        usedJina = true;
+        console.log(`[extract] Got ${content.length} chars via Jina Reader`);
+      } catch (jinaErr) {
+        console.log(`[extract] Jina failed (${jinaErr.message}), falling back to direct fetch`);
+        content = await fetchUrl(url);
+      }
+
+      // Check if Jina returned markdown with event list pattern
+      if (usedJina && isMarkdownEventList(content)) {
+        const events = parseMarkdownEvents(content, url);
+        if (events.length > 1) {
+          console.log(`[extract] Parsed ${events.length} events from Jina markdown`);
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true, multiple: true, events, total: events.length, source: url }));
+          return;
+        }
+      }
+
+      // Single event extraction
+      // If we used Jina, extract from the markdown/text content
+      // If direct fetch, extract from HTML
+      const result = usedJina 
+        ? extractEventFromJinaContent(content, url)
+        : extractEventData(content, url);
+      
+      console.log(`[extract] Result: success=${result.success}, fields=${Object.keys(result.data).length}, via=${usedJina ? 'jina' : 'direct'}`);
 
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(result));
