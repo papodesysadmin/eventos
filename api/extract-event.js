@@ -439,6 +439,129 @@ function fetchUrl(url) {
 }
 
 // ============================================================
+// MULTI-EVENT EXTRACTION (Markdown format - agenda-tech-brasil)
+// ============================================================
+
+/**
+ * Detecta se o conteúdo é Markdown com formato de lista de eventos.
+ * Formato: - DD: [Nome](URL) - _Cidade/UF_ ![tipo]
+ */
+function isMarkdownEventList(content) {
+  // Check for the agenda-tech-brasil pattern
+  return content.includes('<!-- ANO') || 
+    (content.match(/^- \d{1,2}.*\[.+\]\(.+\)/m) && content.match(/_{1,2}[A-ZÀ-Ú].*\/[A-Z]{2}_{1,2}/m));
+}
+
+/**
+ * Parse markdown event list (agenda-tech-brasil format).
+ * Returns array of event objects.
+ */
+function parseMarkdownEvents(content, sourceUrl) {
+  const events = [];
+  const lines = content.split('\n');
+  
+  let currentMonth = null;
+  let currentYear = null;
+  
+  // Detect year from content
+  const yearMatch = content.match(/## Eventos em (\d{4})/);
+  if (yearMatch) currentYear = yearMatch[1];
+  if (!currentYear) {
+    const yearMatch2 = content.match(/ANO(\d{4})/);
+    if (yearMatch2) currentYear = yearMatch2[1];
+  }
+  if (!currentYear) currentYear = new Date().getFullYear().toString();
+
+  const monthMap = {
+    'janeiro': '01', 'fevereiro': '02', 'março': '03', 'marco': '03',
+    'abril': '04', 'maio': '05', 'junho': '06', 'julho': '07',
+    'agosto': '08', 'setembro': '09', 'outubro': '10',
+    'novembro': '11', 'dezembro': '12',
+  };
+
+  for (const line of lines) {
+    // Detect month headers: ### Janeiro, ### Fevereiro, etc.
+    const monthHeader = line.match(/^###\s+(\w+)/i);
+    if (monthHeader) {
+      const m = monthMap[monthHeader[1].toLowerCase()];
+      if (m) currentMonth = m;
+      continue;
+    }
+
+    // Parse event lines: - DD: [Nome](URL) - _Cidade/UF_ ![tipo]
+    // Also handles: - DD e DD: [Nome](URL) - _Cidade/UF_ ![tipo]
+    // Also handles: - DD, DD e DD: [Nome](URL) - _Cidade/UF_ ![tipo]
+    const eventMatch = line.match(/^-\s+(\d{1,2})(?:[,\s]+(\d{1,2}))?\s*(?:e\s+(\d{1,2}))?\s*:\s*\[([^\]]+)\]\(([^)]+)\)\s*(?:-\s*_([^_]+)_)?\s*(?:!\[([^\]]*)\])?/);
+    if (!eventMatch || !currentMonth) continue;
+
+    const dayStart = eventMatch[1];
+    const dayMid = eventMatch[2]; // optional middle day (for "DD, DD e DD")
+    const dayEnd = eventMatch[3]; // optional end day (for "DD e DD")
+    const nome = eventMatch[4].trim();
+    const url = eventMatch[5].trim();
+    const location = eventMatch[6] ? eventMatch[6].trim() : null;
+    const tipo = eventMatch[7] ? eventMatch[7].trim() : null; // presencial, online, híbrido
+
+    const dataInicio = `${currentYear}-${currentMonth}-${dayStart.padStart(2, '0')}`;
+    let dataFim = null;
+    
+    // Determine end date
+    const lastDay = dayEnd || dayMid;
+    if (lastDay) {
+      dataFim = `${currentYear}-${currentMonth}-${lastDay.padStart(2, '0')}`;
+    }
+
+    // Parse location: "Cidade/UF" or "Grande São Paulo/SP"
+    let cidade = null;
+    let estado = null;
+    if (location) {
+      const locParts = location.split('/');
+      if (locParts.length === 2) {
+        cidade = locParts[0].trim();
+        estado = locParts[1].trim();
+      } else {
+        cidade = location;
+      }
+    }
+
+    // Infer category from name
+    const categoria = inferCategory(nome) || 'Geral';
+
+    const event = {
+      nome,
+      dataInicio,
+      url,
+      cidade: cidade || null,
+      estado: estado || null,
+      pais: 'Brasil',
+      local: null,
+      categoria,
+    };
+
+    if (dataFim) event.dataFim = dataFim;
+    if (tipo) event.formato = tipo; // presencial, online, híbrido
+
+    events.push(event);
+  }
+
+  return events;
+}
+
+/**
+ * Detect if URL is a GitHub raw content or repo README
+ */
+function getGitHubRawUrl(url) {
+  // https://github.com/user/repo → https://raw.githubusercontent.com/user/repo/main/README.md
+  const ghMatch = url.match(/github\.com\/([^/]+)\/([^/]+)\/?$/);
+  if (ghMatch) {
+    return `https://raw.githubusercontent.com/${ghMatch[1]}/${ghMatch[2]}/main/README.md`;
+  }
+  // Already raw
+  if (url.includes('raw.githubusercontent.com')) return url;
+  return null;
+}
+
+// ============================================================
 // HTTP SERVER
 // ============================================================
 
@@ -474,8 +597,32 @@ const server = http.createServer(async (req, res) => {
       }
 
       console.log(`[extract] Fetching: ${url}`);
-      const html = await fetchUrl(url);
-      const result = extractEventData(html, url);
+      
+      // Check if it's a GitHub repo URL — fetch README directly
+      const rawUrl = getGitHubRawUrl(url);
+      const fetchTarget = rawUrl || url;
+      
+      const content = await fetchUrl(fetchTarget);
+
+      // Check if content is a markdown event list
+      if (isMarkdownEventList(content)) {
+        console.log(`[extract] Detected markdown event list`);
+        const events = parseMarkdownEvents(content, url);
+        console.log(`[extract] Parsed ${events.length} events from markdown`);
+        
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ 
+          success: true, 
+          multiple: true, 
+          events: events,
+          total: events.length,
+          source: url,
+        }));
+        return;
+      }
+
+      // Single event extraction (HTML)
+      const result = extractEventData(content, url);
       console.log(`[extract] Result: success=${result.success}, fields=${Object.keys(result.data).length}`);
 
       res.writeHead(200, { 'Content-Type': 'application/json' });

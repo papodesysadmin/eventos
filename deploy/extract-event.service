@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 Type=simple
-User=linuxmen
-WorkingDirectory=/var/www/eventos/api
+User=www-data
+WorkingDirectory=/var/www/eventos
 ExecStart=/usr/bin/node /var/www/eventos/api/extract-event.js
 Restart=on-failure
 RestartSec=5

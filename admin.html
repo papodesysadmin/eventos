@@ -727,8 +727,16 @@
 
         const result = await response.json();
 
+        // Multiple events (markdown list)
+        if (result.multiple && result.events && result.events.length > 0) {
+          mostrarListaEventos(result.events, presencaTipo);
+          statusEl.className = 'import-status success';
+          statusEl.innerHTML = '✅ Encontrados <strong>' + result.events.length + ' eventos</strong> na página. Selecione os que deseja importar.';
+          return false;
+        }
+
+        // Single event
         if (result.data && (result.data.nome || result.data.dataInicio)) {
-          // Preencher o formulário de adição com os dados extraídos
           preencherFormulario(result.data, presencaTipo);
 
           const camposPreenchidos = Object.keys(result.data).filter(k => result.data[k]).length;
@@ -741,7 +749,6 @@
           statusEl.className = 'import-status success';
           statusEl.innerHTML = msg;
 
-          // Scroll para o formulário de adição
           document.getElementById('add-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else {
           statusEl.className = 'import-status error';
@@ -757,6 +764,93 @@
       }
 
       return false;
+    }
+
+    function mostrarListaEventos(eventsList, presencaTipo) {
+      // Remove previous list if exists
+      const existing = document.getElementById('multi-events-list');
+      if (existing) existing.remove();
+
+      const container = document.createElement('div');
+      container.id = 'multi-events-list';
+      container.style.cssText = 'background:#1a1a2e;border:1px solid #ff9800;border-radius:8px;padding:1rem;margin-top:1rem;max-height:400px;overflow-y:auto;';
+
+      let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;">';
+      html += '<strong style="color:#ff9800;">Selecione os eventos para importar:</strong>';
+      html += '<button onclick="importarSelecionados(\'' + escapeAttr(presencaTipo) + '\')" class="btn-import" style="padding:0.4rem 1rem;font-size:0.85rem;">Importar Selecionados</button>';
+      html += '</div>';
+
+      html += '<div style="margin-bottom:0.5rem;"><label style="color:#9a9ab0;font-size:0.8rem;cursor:pointer;"><input type="checkbox" id="select-all-events" onchange="toggleAllEvents(this.checked)" style="margin-right:0.4rem;">Selecionar todos</label></div>';
+
+      eventsList.forEach(function(ev, i) {
+        const checked = '';
+        html += '<label style="display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0.5rem;border-bottom:1px solid #2a2a3a;cursor:pointer;font-size:0.85rem;color:#f0f0f5;">';
+        html += '<input type="checkbox" class="event-checkbox" data-index="' + i + '" ' + checked + '>';
+        html += '<span style="flex:1;">';
+        html += '<strong>' + escapeHtml(ev.nome) + '</strong>';
+        html += ' <span style="color:#9a9ab0;">— ' + (ev.dataInicio || '?') + '</span>';
+        if (ev.cidade) html += ' <span style="color:#666;">(' + escapeHtml(ev.cidade) + (ev.estado ? '/' + ev.estado : '') + ')</span>';
+        if (ev.formato) html += ' <span style="background:#333;color:#aaa;font-size:0.7rem;padding:0.1rem 0.3rem;border-radius:3px;">' + ev.formato + '</span>';
+        html += '</span>';
+        html += '</label>';
+      });
+
+      container.innerHTML = html;
+
+      // Store events data for later import
+      container.dataset.events = JSON.stringify(eventsList);
+
+      document.getElementById('import-status').after(container);
+    }
+
+    function toggleAllEvents(checked) {
+      document.querySelectorAll('.event-checkbox').forEach(function(cb) { cb.checked = checked; });
+    }
+
+    function importarSelecionados(presencaTipo) {
+      const container = document.getElementById('multi-events-list');
+      if (!container) return;
+
+      const eventsList = JSON.parse(container.dataset.events);
+      const checkboxes = container.querySelectorAll('.event-checkbox:checked');
+
+      if (checkboxes.length === 0) {
+        alert('Selecione ao menos um evento.');
+        return;
+      }
+
+      checkboxes.forEach(function(cb) {
+        const idx = parseInt(cb.dataset.index);
+        const ev = eventsList[idx];
+
+        const novoEvento = {
+          id: gerarId(),
+          nome: ev.nome,
+          dataInicio: ev.dataInicio,
+          local: ev.local || '',
+          cidade: ev.cidade || '',
+          estado: ev.estado || '',
+          pais: ev.pais || 'Brasil',
+          url: ev.url || '',
+          categoria: ev.categoria || 'Geral',
+        };
+
+        if (ev.dataFim) novoEvento.dataFim = ev.dataFim;
+        if (presencaTipo) {
+          novoEvento.presenca = { confirmada: true, tipo: presencaTipo };
+        }
+
+        eventos.push(novoEvento);
+      });
+
+      marcarAlteracoes();
+      renderizarTabela();
+
+      // Cleanup
+      container.remove();
+      const statusEl = document.getElementById('import-status');
+      statusEl.className = 'import-status success';
+      statusEl.innerHTML = '✅ ' + checkboxes.length + ' evento(s) importado(s) com sucesso! Clique em "Salvar Alterações" para baixar o JSON.';
     }
 
     function preencherFormulario(data, presencaTipo) {
