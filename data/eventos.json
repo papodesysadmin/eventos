@@ -1,6 +1,6 @@
 [
   {
-    "id": "b7e2c4a1-9f3d-4e8b-a1c6-d5f0e7a2b3c4",
+    "id": "10e51407-103f-454d-9e60-49dc8f321383",
     "nome": "KubeCon South America 2026",
     "dataInicio": "2026-03-15",
     "dataFim": "2026-03-17",
@@ -17,7 +17,24 @@
     }
   },
   {
-    "id": "a3f1d8e2-6b4c-4a9e-b7d5-c2e8f1a0b6d9",
+    "id": "52303f1d-19d1-4155-8148-25d696c17d2c",
+    "nome": "TDC Summit São Paulo",
+    "dataInicio": "2026-03-26",
+    "dataFim": "2026-03-27",
+    "local": "Hotel Pullman Vila Olímpia",
+    "cidade": "São Paulo",
+    "estado": "SP",
+    "pais": "Brasil",
+    "url": "https://thedevconf.com/tdc/2026/summit-sao-paulo/",
+    "categoria": "Geral",
+    "descricao": "TDC Summit - evento híbrido de tecnologia",
+    "presenca": {
+      "confirmada": true,
+      "tipo": "palestrante"
+    }
+  },
+  {
+    "id": "6a39cfb5-2c52-4868-b591-c1f01f43d539",
     "nome": "DevOpsDays São Paulo 2026",
     "dataInicio": "2026-05-20",
     "dataFim": "2026-05-21",
@@ -34,23 +51,9 @@
     }
   },
   {
-    "id": "c9d4e7f3-2a1b-4c8d-9e6f-a5b3c0d1e2f4",
-    "nome": "The Developers Conference - Florianópolis 2026",
-    "dataInicio": "2026-06-10",
-    "dataFim": "2026-06-12",
-    "local": "CentroSul",
-    "cidade": "Florianópolis",
-    "estado": "SC",
-    "pais": "Brasil",
-    "url": "https://thedevconf.com/tdc/2026/florianopolis",
-    "categoria": "Geral",
-    "descricao": "Um dos maiores eventos de desenvolvedores do Brasil"
-  },
-  {
-    "id": "d1e5f8a4-3b2c-4d9e-a0f7-b6c4d2e3f5a1",
+    "id": "5026041f-3d13-4506-8694-4740787f1bdb",
     "nome": "BSides São Paulo 2026",
     "dataInicio": "2026-05-20",
-    "dataFim": "2026-05-20",
     "local": "Hotel Pullman Vila Olímpia",
     "cidade": "São Paulo",
     "estado": "SP",
@@ -60,7 +63,165 @@
     "descricao": "Conferência de segurança da informação organizada pela comunidade"
   },
   {
-    "id": "e2f6a9b5-4c3d-4e0f-b1a8-c7d5e3f4a6b2",
+    "id": "50423929-03a8-458e-b049-1d3c92d55053",
+    "nome": "O Que Ninguém Está Te Contando Sobre IA",
+    "dataInicio": "2026-05-29",
+    "local": "Sebrae Maringá",
+    "cidade": "Maringá",
+    "estado": "PR",
+    "pais": "Brasil",
+    "url": "https://ia.papodesysadmin.org/",
+    "categoria": "IA",
+    "descricao": "Evento gratuito sobre IA para empresários. Estratégias práticas para multiplicar resultados.",
+    "presenca": {
+      "confirmada": true,
+      "tipo": "organizador"
+    }
+  },
+  {
+    "id": "acc90bd9-a646-45ec-9691-1cf72396e3a8",
+    "nome": "DunaSec 2026",
+    "dataInicio": "2026-05-30",
+    "local": "",
+    "cidade": "Natal",
+    "estado": "RN",
+    "pais": "Brasil",
+    "url": "https://dunasec.com.br",
+    "categoria": "Geral",
+    "descricao": "Evento presencial"
+  },
+  {
+    "id": "27fc2754-44a9-4184-9b1e-84c14880ade5",
+    "nome": "Agile Trends Nordeste",
+    "dataInicio": "2026-06-01",
+    "local": "",
+    "cidade": "Recife",
+    "estado": "PE",
+    "pais": "Brasil",
+    "url": "https://doity.com.br/agile-trends-nordeste-2026",
+    "categoria": "Geral",
+    "dataFim": "2026-06-02",
+    "descricao": "Evento presencial"
+  },
+  {
+    "id": "1382e54b-917e-495e-821b-99492cef5509",
+    "nome": "Web Summit Rio 2026",
+    "dataInicio": "2026-06-08",
+    "local": "",
+    "cidade": "Rio De Janeiro",
+    "estado": "RJ",
+    "pais": "Brasil",
+    "url": "https://rio.websummit.com/",
+    "categoria": "Geral",
+    "dataFim": "2026-06-11",
+    "descricao": "Evento presencial"
+  },
+  {
+    "id": "efcf6ca2-ec23-42bc-8983-4ec4d9f82222",
+    "nome": "Web Summit Rio - SaaS Summit",
+    "dataInicio": "2026-07-08",
+    "local": "",
+    "cidade": "Rio De Janeiro",
+    "estado": "RJ",
+    "pais": "Brasil",
+    "url": "https://rio.websummit.com/pt-br/tracks/saas-summit/",
+    "categoria": "Geral",
+    "dataFim": "2026-07-11",
+    "descricao": "Evento presencial"
+  },
+  {
+    "id": "6ac128fc-b512-4579-b760-ca46999fd7b5",
+    "nome": "TDC Floripa 2026",
+    "dataInicio": "2026-07-22",
+    "dataFim": "2026-07-24",
+    "local": "CentroSul",
+    "cidade": "Florianópolis",
+    "estado": "SC",
+    "pais": "Brasil",
+    "url": "https://thedevconf.com/tdc/2026/florianopolis/",
+    "categoria": "Geral",
+    "descricao": "TDC Floripa - evento híbrido de tecnologia",
+    "presenca": {
+      "confirmada": true,
+      "tipo": "palestrante"
+    }
+  },
+  {
+    "id": "d32dc738-8fd3-44d4-8e07-17042b2fdb5f",
+    "nome": "Agile Trends São Paulo",
+    "dataInicio": "2026-07-31",
+    "local": "",
+    "cidade": "São Paulo",
+    "estado": "SP",
+    "pais": "Brasil",
+    "url": "https://doity.com.br/agile-trends-2026",
+    "categoria": "Geral",
+    "descricao": "Evento presencial"
+  },
+  {
+    "id": "b492c587-e52d-4ae0-9706-7a4136e84fbf",
+    "nome": "TDC Experience Rio Innovation Week | Píer Mauá",
+    "dataInicio": "2026-08-05",
+    "local": "",
+    "cidade": "Rio De Janeiro",
+    "estado": "RJ",
+    "pais": "Brasil",
+    "url": "https://thedevconf.com/tdc/2026/index.html",
+    "categoria": "Geral",
+    "dataFim": "2026-08-06",
+    "descricao": "Evento híbrido"
+  },
+  {
+    "id": "b77cf6f9-0a66-4ed2-8ec4-933d62c897d9",
+    "nome": "Codecon Summit 2026",
+    "dataInicio": "2026-08-14",
+    "local": "",
+    "cidade": "Pinhais",
+    "estado": "PR",
+    "pais": "Brasil",
+    "url": "https://eventos.codecon.dev/eventos/codecon-summit-26",
+    "categoria": "Geral",
+    "descricao": "Evento presencial"
+  },
+  {
+    "id": "019cfcbc-0b57-474a-8df7-f609fcaa5a57",
+    "nome": "Gophercon LATAM 2026",
+    "dataInicio": "2026-09-02",
+    "local": "",
+    "cidade": "Florianópolis",
+    "estado": "SC",
+    "pais": "Brasil",
+    "url": "https://gopherconlatam.org/",
+    "categoria": "Geral",
+    "dataFim": "2026-09-04",
+    "descricao": "Evento presencial"
+  },
+  {
+    "id": "391bbf85-475f-4a60-a3df-e72e07e223ca",
+    "nome": "RecrutaTech 9ª edição",
+    "dataInicio": "2026-09-20",
+    "local": "",
+    "cidade": "Curitiba",
+    "estado": "PR",
+    "pais": "Brasil",
+    "url": "https://recrutatech.com.br/",
+    "categoria": "Geral",
+    "descricao": "Evento presencial"
+  },
+  {
+    "id": "05817009-940b-468a-9f47-1b4c2cd1b1f1",
+    "nome": "Python Brasil 2026",
+    "dataInicio": "2026-10-14",
+    "local": "",
+    "cidade": "Florianópolis",
+    "estado": "SC",
+    "pais": "Brasil",
+    "url": "https://2026.pythonbrasil.org.br/",
+    "categoria": "Geral",
+    "descricao": "Evento presencial"
+  },
+  {
+    "id": "5379b008-0431-45a4-b1b6-ce41107a7a9e",
     "nome": "Latinoware 2026",
     "dataInicio": "2026-10-22",
     "dataFim": "2026-10-24",
@@ -75,17 +236,5 @@
       "confirmada": true,
       "tipo": "organizador"
     }
-  },
-  {
-    "nome": "TDC FLORIPA",
-    "dataInicio": "2026-07-22",
-    "local": "CentroSul - Florianópolis",
-    "cidade": "Florianopolis",
-    "estado": "Santa Catarina",
-    "pais": "Brasil",
-    "url": "https://thedevconf.com/tdc/2026/florianopolis/",
-    "categoria": "IA",
-    "descricao": "O TDC FLORIPA 2026 é um evento híbrido. Acompanhe online ou presencial, em FLORIANÓPOLIS, entre os dias 22 a 24 de julho. Inscreva-se!",
-    "id": "a254b452-cdac-4cdc-9c89-c23c62d083a5"
   }
 ]
