@@ -18,16 +18,16 @@
   },
   {
     "id": "52303f1d-19d1-4155-8148-25d696c17d2c",
-    "nome": "TDC Summit São Paulo",
-    "dataInicio": "2026-03-26",
-    "dataFim": "2026-03-27",
-    "local": "Hotel Pullman Vila Olímpia",
+    "nome": "TDC Summit São Paulo 2026",
+    "dataInicio": "2026-04-23",
+    "dataFim": "2026-04-24",
+    "local": "",
     "cidade": "São Paulo",
     "estado": "SP",
     "pais": "Brasil",
     "url": "https://thedevconf.com/tdc/2026/summit-sao-paulo/",
     "categoria": "Geral",
-    "descricao": "TDC Summit - evento híbrido de tecnologia",
+    "descricao": "TDC Summit São Paulo - evento híbrido de tecnologia e inovação",
     "presenca": {
       "confirmada": true,
       "tipo": "palestrante"
@@ -160,16 +160,16 @@
   },
   {
     "id": "b492c587-e52d-4ae0-9706-7a4136e84fbf",
-    "nome": "TDC Experience Rio Innovation Week",
+    "nome": "TDC Stage Rio de Janeiro 2026",
     "dataInicio": "2026-08-05",
     "local": "Píer Mauá",
     "cidade": "Rio de Janeiro",
     "estado": "RJ",
     "pais": "Brasil",
-    "url": "https://thedevconf.com/tdc/2026/rio-innovation-week/",
+    "url": "https://thedevconf.com/tdc/2026/stage/rio/",
     "categoria": "Geral",
     "dataFim": "2026-08-06",
-    "descricao": "TDC Experience no Píer Mauá durante a Rio Innovation Week"
+    "descricao": "TDC Stage no Píer Mauá durante a Rio Innovation Week"
   },
   {
     "id": "b77cf6f9-0a66-4ed2-8ec4-933d62c897d9",
@@ -185,16 +185,16 @@
   },
   {
     "id": "c3d4e5f6-7a8b-4c9d-0e1f-a2b3c4d5e6f7",
-    "nome": "TDC Experience São Carlos",
+    "nome": "TDC Stage São Carlos 2026",
     "dataInicio": "2026-08-26",
     "dataFim": "2026-08-27",
     "local": "",
     "cidade": "São Carlos",
     "estado": "SP",
     "pais": "Brasil",
-    "url": "https://thedevconf.com/tdc/2026/sao-carlos/",
+    "url": "https://thedevconf.com/tdc/2026/stage/sao-carlos/",
     "categoria": "Geral",
-    "descricao": "TDC Experience São Carlos - evento híbrido"
+    "descricao": "TDC Stage São Carlos - evento híbrido"
   },
   {
     "id": "019cfcbc-0b57-474a-8df7-f609fcaa5a57",
@@ -208,6 +208,19 @@
     "categoria": "Desenvolvimento",
     "dataFim": "2026-09-04",
     "descricao": "Conferência de Go/Golang da América Latina"
+  },
+  {
+    "id": "f6a7b8c9-0d1e-4f2a-3b4c-d5e6f7a8b9c0",
+    "nome": "TDC Stage Santa Rita do Sapucaí 2026",
+    "dataInicio": "2026-09-04",
+    "dataFim": "2026-09-05",
+    "local": "",
+    "cidade": "Santa Rita do Sapucaí",
+    "estado": "MG",
+    "pais": "Brasil",
+    "url": "https://thedevconf.com/tdc/2026/stage/santa-rita/",
+    "categoria": "Geral",
+    "descricao": "TDC Stage no Vale da Eletrônica - evento híbrido"
   },
   {
     "id": "391bbf85-475f-4a60-a3df-e72e07e223ca",
@@ -282,27 +295,27 @@
   },
   {
     "id": "a8c3d1e4-5f6b-4a2c-9d7e-b0f1c2d3e4a5",
-    "nome": "TDC Experience Recife | Rec'n'Play",
+    "nome": "TDC Stage Recife 2026",
     "dataInicio": "2026-11-11",
     "dataFim": "2026-11-12",
     "local": "Rec'n'Play",
     "cidade": "Recife",
     "estado": "PE",
     "pais": "Brasil",
-    "url": "https://thedevconf.com/tdc/2026/recife/",
+    "url": "https://thedevconf.com/tdc/2026/stage/recife/",
     "categoria": "Geral",
-    "descricao": "TDC Experience durante o festival Rec'n'Play em Recife"
+    "descricao": "TDC Stage durante o festival Rec'n'Play em Recife"
   },
   {
     "id": "b9d4e2f5-6a7c-4b3d-8e0f-c1d2e3f4a5b6",
-    "nome": "TDCX Porto Alegre",
+    "nome": "TDC Experience Porto Alegre 2026",
     "dataInicio": "2026-12-09",
     "dataFim": "2026-12-10",
     "local": "",
     "cidade": "Porto Alegre",
     "estado": "RS",
     "pais": "Brasil",
-    "url": "https://thedevconf.com/tdc/2026/porto-alegre/",
+    "url": "https://thedevconf.com/tdc/2026/experience/porto-alegre/",
     "categoria": "Geral",
     "descricao": "TDC Experience Porto Alegre - evento híbrido"
   }
