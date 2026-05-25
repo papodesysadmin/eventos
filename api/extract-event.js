@@ -473,7 +473,7 @@ function parseMarkdownEvents(content, sourceUrl) {
   if (!currentYear) currentYear = new Date().getFullYear().toString();
 
   const monthMap = {
-    'janeiro': '01', 'fevereiro': '02', 'março': '03', 'marco': '03',
+    'janeiro': '01', 'fevereiro': '02', 'março': '03', 'marco': '03', 'marã§o': '03',
     'abril': '04', 'maio': '05', 'junho': '06', 'julho': '07',
     'agosto': '08', 'setembro': '09', 'outubro': '10',
     'novembro': '11', 'dezembro': '12',
@@ -481,34 +481,49 @@ function parseMarkdownEvents(content, sourceUrl) {
 
   for (const line of lines) {
     // Detect month headers: ### Janeiro, ### Fevereiro, etc.
-    const monthHeader = line.match(/^###\s+(\w+)/i);
+    const monthHeader = line.match(/^###\s+(\S+)/i);
     if (monthHeader) {
-      const m = monthMap[monthHeader[1].toLowerCase()];
+      const rawMonth = monthHeader[1].toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // remove accents
+      // Map without accents
+      const monthMapNorm = {
+        'janeiro': '01', 'fevereiro': '02', 'marco': '03',
+        'abril': '04', 'maio': '05', 'junho': '06', 'julho': '07',
+        'agosto': '08', 'setembro': '09', 'outubro': '10',
+        'novembro': '11', 'dezembro': '12',
+      };
+      const m = monthMap[monthHeader[1].toLowerCase()] || monthMapNorm[rawMonth];
       if (m) currentMonth = m;
       continue;
     }
 
-    // Parse event lines: - DD: [Nome](URL) - _Cidade/UF_ ![tipo]
-    // Also handles: - DD e DD: [Nome](URL) - _Cidade/UF_ ![tipo]
-    // Also handles: - DD, DD e DD: [Nome](URL) - _Cidade/UF_ ![tipo]
-    const eventMatch = line.match(/^-\s+(\d{1,2})(?:[,\s]+(\d{1,2}))?\s*(?:e\s+(\d{1,2}))?\s*:\s*\[([^\]]+)\]\(([^)]+)\)\s*(?:-\s*_([^_]+)_)?\s*(?:!\[([^\]]*)\])?/);
+    // Parse event lines. Patterns:
+    // - DD: [Nome](URL) - _Cidade/UF_ ![tipo]
+    // - DD e DD: [Nome](URL) - _Cidade/UF_ ![tipo]
+    // - DD, DD e DD: [Nome](URL) - _Cidade/UF_ ![tipo]
+    // - DD, DD, DD e DD: [Nome](URL) - _Cidade/UF_ ![tipo]
+    const eventMatch = line.match(/^-\s+([\d,\s]+(?:e\s+\d+)?)\s*:\s*\[([^\]]+)\]\(([^)]+)\)\s*(?:-\s*_([^_]+)_)?\s*(?:!\[([^\]]*)\])?/);
     if (!eventMatch || !currentMonth) continue;
 
-    const dayStart = eventMatch[1];
-    const dayMid = eventMatch[2]; // optional middle day (for "DD, DD e DD")
-    const dayEnd = eventMatch[3]; // optional end day (for "DD e DD")
-    const nome = eventMatch[4].trim();
-    const url = eventMatch[5].trim();
-    const location = eventMatch[6] ? eventMatch[6].trim() : null;
-    const tipo = eventMatch[7] ? eventMatch[7].trim() : null; // presencial, online, híbrido
+    const daysStr = eventMatch[1]; // "08, 09, 10 e 11" or "22" or "01 e 02"
+    const nome = eventMatch[2].trim();
+    const url = eventMatch[3].trim();
+    const location = eventMatch[4] ? eventMatch[4].trim() : null;
+    const tipo = eventMatch[5] ? eventMatch[5].trim() : null;
+
+    // Parse days: extract all numbers
+    const dayNumbers = daysStr.match(/\d+/g);
+    if (!dayNumbers || dayNumbers.length === 0) continue;
+
+    const dayStart = dayNumbers[0];
+    const dayEnd = dayNumbers.length > 1 ? dayNumbers[dayNumbers.length - 1] : null;
 
     const dataInicio = `${currentYear}-${currentMonth}-${dayStart.padStart(2, '0')}`;
     let dataFim = null;
     
     // Determine end date
-    const lastDay = dayEnd || dayMid;
-    if (lastDay) {
-      dataFim = `${currentYear}-${currentMonth}-${lastDay.padStart(2, '0')}`;
+    if (dayEnd) {
+      dataFim = `${currentYear}-${currentMonth}-${dayEnd.padStart(2, '0')}`;
     }
 
     // Parse location: "Cidade/UF" or "Grande São Paulo/SP"
