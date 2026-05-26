@@ -246,5 +246,90 @@
     "url": "https://thedevconf.com/tdc/2026/experience/porto-alegre/",
     "categoria": "Geral",
     "descricao": "TDC Experience Porto Alegre - evento híbrido de tecnologia"
+  },
+  {
+    "id": "a1b2c3d4-1111-4aaa-bbbb-devlife-ctba",
+    "nome": "The Developers Life Weekend 2026 - Curitiba",
+    "dataInicio": "2026-03-12",
+    "dataFim": "2026-03-14",
+    "local": "FESP",
+    "cidade": "Curitiba",
+    "estado": "PR",
+    "pais": "Brasil",
+    "url": "https://weekend.developerslife.tech/evento/8/the-developers-life-weekend-2026-curitiba-pr",
+    "categoria": "Desenvolvimento",
+    "descricao": "Evento de devs do Paraná com palestras online, workshops e presencial na FESP",
+    "presenca": {
+      "confirmada": true,
+      "tipo": "palestrante"
+    }
+  },
+  {
+    "id": "a1b2c3d4-2222-4aaa-bbbb-devlife-mga",
+    "nome": "The Developers Life Weekend 2026 - Maringá",
+    "dataInicio": "2026-05-28",
+    "dataFim": "2026-05-30",
+    "local": "UniCesumar",
+    "cidade": "Maringá",
+    "estado": "PR",
+    "pais": "Brasil",
+    "url": "https://weekend.developerslife.tech/evento/9/the-developers-life-weekend-2026-maringa-pr",
+    "categoria": "Desenvolvimento",
+    "descricao": "Evento de devs do Paraná com palestras online, workshops e presencial na UniCesumar",
+    "presenca": {
+      "confirmada": true,
+      "tipo": "palestrante"
+    }
+  },
+  {
+    "id": "a1b2c3d4-3333-4aaa-bbbb-devlife-umu",
+    "nome": "The Developers Life Weekend 2026 - Umuarama",
+    "dataInicio": "2026-08-20",
+    "dataFim": "2026-08-22",
+    "local": "UniALFA",
+    "cidade": "Umuarama",
+    "estado": "PR",
+    "pais": "Brasil",
+    "url": "https://weekend.developerslife.tech/evento/12/the-developers-life-weekend-2026-umuarama-pr",
+    "categoria": "Desenvolvimento",
+    "descricao": "Evento de devs do Paraná com palestras online, workshops e presencial na UniALFA",
+    "presenca": {
+      "confirmada": true,
+      "tipo": "palestrante"
+    }
+  },
+  {
+    "id": "a1b2c3d4-4444-4aaa-bbbb-devlife-lda",
+    "nome": "The Developers Life Weekend 2026 - Londrina",
+    "dataInicio": "2026-09-10",
+    "dataFim": "2026-09-12",
+    "local": "UniCesumar",
+    "cidade": "Londrina",
+    "estado": "PR",
+    "pais": "Brasil",
+    "url": "https://weekend.developerslife.tech/evento/10/the-developers-life-weekend-2026-londrina-pr",
+    "categoria": "Desenvolvimento",
+    "descricao": "Evento de devs do Paraná com palestras online, workshops e presencial na UniCesumar",
+    "presenca": {
+      "confirmada": true,
+      "tipo": "palestrante"
+    }
+  },
+  {
+    "id": "a1b2c3d4-5555-4aaa-bbbb-devlife-cmo",
+    "nome": "The Developers Life Weekend 2026 - Campo Mourão",
+    "dataInicio": "2026-10-29",
+    "dataFim": "2026-10-31",
+    "local": "Eco Campus - Grupo Integrado",
+    "cidade": "Campo Mourão",
+    "estado": "PR",
+    "pais": "Brasil",
+    "url": "https://weekend.developerslife.tech/evento/11/the-developers-life-weekend-2026-campo-mourao-pr",
+    "categoria": "Desenvolvimento",
+    "descricao": "Evento de devs do Paraná com palestras online, workshops e presencial no Grupo Integrado",
+    "presenca": {
+      "confirmada": true,
+      "tipo": "palestrante"
+    }
   }
 ]
