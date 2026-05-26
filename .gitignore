@@ -1,5 +1,3 @@
 node_modules/
 .vscode/
-.kiro/
-cli/__tests__/
 *.log

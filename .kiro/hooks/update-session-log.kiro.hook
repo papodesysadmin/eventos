@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Atualizar Session Log",
+  "description": "Ao final de cada execução do agente, lembra de atualizar o arquivo .kiro/steering/session-log.md com o resumo do que foi feito na sessão atual.",
+  "version": "1",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Atualize o arquivo .kiro/steering/session-log.md com um resumo do que foi feito nesta sessão. Mova o conteúdo da \"Última sessão\" para \"Sessões anteriores\" e preencha a nova \"Última sessão\" com: data, contexto (branch, mudanças), o que foi feito, e pendências/próximos passos. Seja conciso mas informativo."
+  }
+}
