@@ -473,6 +473,171 @@ function fetchUrl(url) {
 }
 
 // ============================================================
+// MULTI-EVENT DETECTION FROM JINA CONTENT
+// ============================================================
+
+/**
+ * Detect multiple sub-events in a page (e.g., same event in different cities/dates).
+ * Looks for patterns like:
+ * - "## Event Name 2026 - Cidade" with dates
+ * - Links to sub-event pages with city names
+ */
+function detectMultipleEventsFromJina(content, originalUrl) {
+  const events = [];
+  // Normalize: join broken lines (Jina sometimes wraps long lines)
+  const normalizedContent = content.replace(/\n([a-zà-ú])/g, '$1');
+  const lines = normalizedContent.split('\n');
+
+  // Pattern 1: "## Event Name 2026 - Cidade- UF" followed by date info
+  // e.g. "## The Developers Life Weekend 2026 - Maringá- PR"
+  //       "Dia 20 Palestras Online, Dia 21 Workshops Online e Dia 22 de Agosto Presencial na UniALFA"
+  const headerPattern = /^##\s+(.+?)\s*[-–]\s*([A-ZÀ-Ú][a-zà-ú]+(?:\s+[A-Za-zÀ-ú]+)?)\s*[-–]?\s*([A-Z]{2})?\s*$/;
+  
+  for (let i = 0; i < lines.length; i++) {
+    const match = lines[i].match(headerPattern);
+    if (!match) continue;
+    
+    const nome = match[1].trim();
+    const cidade = match[2].trim();
+    const estado = match[3] || null;
+    
+    // Skip if it's a past year or not an event header
+    if (nome.match(/20[0-2][0-4]/) && !nome.includes('2026') && !nome.includes('2027')) continue;
+    if (nome.match(/FAQ|Perguntas|Patrocinador|Conheça|Evolução|Jornada|aprender/i)) continue;
+    
+    // Look at next few lines for date info
+    let dataInicio = null;
+    let dataFim = null;
+    let local = null;
+    let eventUrl = null;
+    
+    for (let j = i + 1; j < Math.min(i + 5, lines.length); j++) {
+      const line = lines[j];
+      
+      // Date pattern: "Dia DD ... Dia DD de Mês" or "DD de Mês"
+      if (!dataInicio) {
+        // "Dia 22 de Agosto" or "Dia 20 ... Dia 22 de Agosto"
+        const diaMatch = line.match(/Dia\s+(\d{1,2}).*?(?:Dia\s+(\d{1,2})\s+)?(?:de\s+)?(\w+)\s+(?:Presencial|Online)/i);
+        if (diaMatch) {
+          const monthNum = MONTHS[diaMatch[3].toLowerCase()];
+          if (monthNum) {
+            const firstDay = diaMatch[1];
+            const lastDay = diaMatch[2] || diaMatch[1];
+            const year = '2026';
+            dataInicio = `${year}-${monthNum}-${firstDay.padStart(2, '0')}`;
+            if (diaMatch[2]) dataFim = `${year}-${monthNum}-${lastDay.padStart(2, '0')}`;
+          }
+        }
+        // "DD a DD de Mês" or "DD e DD de Mês"
+        if (!dataInicio) {
+          const rangeMatch = line.match(/(\d{1,2})\s*(?:a|e|à)\s*(\d{1,2})\s+de\s+(\w+)/i);
+          if (rangeMatch && MONTHS[rangeMatch[3].toLowerCase()]) {
+            const monthNum = MONTHS[rangeMatch[3].toLowerCase()];
+            dataInicio = `2026-${monthNum}-${rangeMatch[1].padStart(2, '0')}`;
+            dataFim = `2026-${monthNum}-${rangeMatch[2].padStart(2, '0')}`;
+          }
+        }
+      }
+      
+      // Local: "na UniALFA" or "no Centro de Convenções"
+      if (!local) {
+        const localMatch = line.match(/(?:na|no)\s+([A-ZÀ-Ú][A-Za-zÀ-ú\s]{2,30}?)(?:\s*$|\s*[,.])/);
+        if (localMatch) local = localMatch[1].trim();
+      }
+      
+      // URL: [Saiba Mais](url) or [Inscreva-se](url)
+      if (!eventUrl) {
+        const urlMatch = line.match(/\[(?:Saiba Mais|Inscreva|Ver detalhes|Inscri)[^\]]*\]\((https?:\/\/[^)\s]+)\)/i);
+        if (urlMatch) eventUrl = urlMatch[1];
+      }
+    }
+    
+    // Also look for links at the bottom of the page matching this city
+    if (!eventUrl) {
+      const cityLower = cidade.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      for (const line of lines) {
+        const linkMatch = line.match(/\[([^\]]*)\]\((https?:\/\/[^)]+)\)/);
+        if (linkMatch) {
+          const linkText = linkMatch[1].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          if (linkText.includes(cityLower) && linkText.includes('2026')) {
+            eventUrl = linkMatch[2];
+            break;
+          }
+        }
+      }
+    }
+    
+    if (nome && (dataInicio || cidade)) {
+      events.push({
+        nome: nome + ' - ' + cidade + (estado ? '/' + estado : ''),
+        dataInicio: dataInicio || null,
+        dataFim: dataFim || null,
+        local: local || null,
+        cidade: cidade,
+        estado: estado || inferEstadoFromCidade(cidade),
+        pais: 'Brasil',
+        url: eventUrl || originalUrl,
+        categoria: inferCategory(nome) || 'Desenvolvimento',
+      });
+    }
+  }
+
+  // Pattern 2: Multiple links at bottom with same base event name + different cities
+  if (events.length === 0) {
+    const eventLinks = [];
+    const baseDomain = new URL(originalUrl).hostname;
+    
+    for (const line of lines) {
+      const linkMatch = line.match(/\[([^\]]+2026[^\]]*)\]\((https?:\/\/[^)]+)\)/);
+      if (linkMatch && linkMatch[2].includes(baseDomain)) {
+        const text = linkMatch[1];
+        const url = linkMatch[2];
+        // Extract city from link text: "Event 2026 - Cidade - UF"
+        const cityMatch = text.match(/[-–]\s*([A-ZÀ-Ú][a-zà-ú]+(?:\s+[A-Za-zÀ-ú]+)?)\s*[-–]?\s*([A-Z]{2})?$/);
+        if (cityMatch) {
+          eventLinks.push({
+            nome: text.trim(),
+            cidade: cityMatch[1].trim(),
+            estado: cityMatch[2] || inferEstadoFromCidade(cityMatch[1].trim()),
+            url: url,
+          });
+        }
+      }
+    }
+    
+    if (eventLinks.length > 1) {
+      return eventLinks.map(e => ({
+        nome: e.nome,
+        dataInicio: null,
+        local: null,
+        cidade: e.cidade,
+        estado: e.estado,
+        pais: 'Brasil',
+        url: e.url,
+        categoria: inferCategory(e.nome) || 'Desenvolvimento',
+      }));
+    }
+  }
+
+  return events.length > 1 ? events : null;
+}
+
+function inferEstadoFromCidade(cidade) {
+  if (!cidade) return null;
+  const map = {
+    'florianópolis': 'SC', 'florianopolis': 'SC', 'são paulo': 'SP', 'sao paulo': 'SP',
+    'rio de janeiro': 'RJ', 'belo horizonte': 'MG', 'porto alegre': 'RS',
+    'curitiba': 'PR', 'brasília': 'DF', 'brasilia': 'DF', 'recife': 'PE',
+    'salvador': 'BA', 'fortaleza': 'CE', 'manaus': 'AM', 'goiânia': 'GO',
+    'campinas': 'SP', 'joinville': 'SC', 'londrina': 'PR', 'natal': 'RN',
+    'maringá': 'PR', 'maringa': 'PR', 'santa rita do sapucaí': 'MG',
+    'foz do iguaçu': 'PR', 'são carlos': 'SP', 'pinhais': 'PR',
+    'campo mourão': 'PR', 'campo mourao': 'PR',
+  };
+  return map[cidade.toLowerCase()] || null;
+}
+
+// ============================================================
 // EXTRACTION FROM JINA READER CONTENT (markdown/text)
 // ============================================================
 
@@ -481,6 +646,12 @@ function fetchUrl(url) {
  * Jina returns clean text with title, image alt texts, links, etc.
  */
 function extractEventFromJinaContent(content, originalUrl) {
+  // First: check if page contains multiple sub-events with their own URLs
+  const multiEvents = detectMultipleEventsFromJina(content, originalUrl);
+  if (multiEvents && multiEvents.length > 1) {
+    return { success: true, multiple: true, events: multiEvents, total: multiEvents.length, source: originalUrl };
+  }
+
   const data = {};
   const lines = content.split('\n');
 
