@@ -686,6 +686,15 @@ function extractEventFromJinaContent(content, originalUrl) {
     }
   }
 
+  // Short date: "DD/MM/YY" (e.g. "28/05/26")
+  if (!data.dataInicio) {
+    const shortDate = content.match(/(\d{2})\/(\d{2})\/(\d{2})(?:\s|·|,|\.|$)/);
+    if (shortDate) {
+      const year = parseInt(shortDate[3]) < 50 ? '20' + shortDate[3] : '19' + shortDate[3];
+      data.dataInicio = `${year}-${shortDate[2]}-${shortDate[1]}`;
+    }
+  }
+
   // ISO dates
   if (!data.dataInicio) {
     const isoDate = content.match(/(\d{4}-\d{2}-\d{2})/);
@@ -729,6 +738,32 @@ function extractEventFromJinaContent(content, originalUrl) {
     const whereMatch = content.match(/(?:\*{0,2}(?:Onde|Endere[çc]o|Venue|Where|Address)\*{0,2})\s*:\s*\[?([^\]\n|]{3,60})/i);
     if (whereMatch) {
       data.local = whereMatch[1].trim().replace(/\*+/g, '');
+    }
+  }
+
+  // Try pattern: "Venue, Cidade" inline (e.g. "Farol Santander, São Paulo")
+  // Look for known venue indicators followed by comma and city
+  if (!data.local) {
+    const knownCities = [
+      'São Paulo', 'Rio de Janeiro', 'Florianópolis', 'Belo Horizonte', 'Porto Alegre',
+      'Curitiba', 'Brasília', 'Recife', 'Salvador', 'Fortaleza', 'Manaus', 'Goiânia',
+      'Campinas', 'Joinville', 'Londrina', 'Natal', 'Maringá', 'Santa Rita do Sapucaí',
+      'Foz do Iguaçu', 'São Carlos', 'Pinhais', 'Guarulhos', 'Campo Mourão', 'Umuarama',
+    ];
+    for (const city of knownCities) {
+      // Pattern: "VenueName, Cidade" or "VenueName · Cidade" or "VenueName - Cidade"
+      const venuePattern = new RegExp(`([A-ZÀ-Ú][A-Za-zÀ-ú\\s]{2,40}?)\\s*[,·\\-]\\s*${city.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i');
+      const venueMatch = content.match(venuePattern);
+      if (venueMatch) {
+        const venue = venueMatch[1].trim();
+        // Filter out false positives (navigation items, generic text)
+        if (venue.length >= 3 && venue.length <= 50 &&
+            !venue.match(/^(Home|Sobre|Eventos|Menu|Login|Contato|Blog|FAQ|http)/i)) {
+          data.local = venue;
+          if (!data.cidade) data.cidade = city;
+          break;
+        }
+      }
     }
   }
 
@@ -781,6 +816,11 @@ function extractEventFromJinaContent(content, originalUrl) {
   // Check required fields
   const required = ['nome', 'dataInicio', 'local', 'cidade', 'estado', 'pais', 'url', 'categoria'];
   const missingFields = required.filter(f => !data[f]);
+
+  // If event has dataInicio but no dataFim, assume single-day event
+  if (data.dataInicio && !data.dataFim) {
+    data.dataFim = data.dataInicio;
+  }
 
   // Collect registration/ticket links for potential follow-up extraction
   const registrationLinks = [];
