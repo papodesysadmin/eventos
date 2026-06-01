@@ -397,15 +397,16 @@
     });
 
     // Admin password (SHA-256 hash of the password)
-    // Default password: "papo2026" - change this hash for a different password
-    var ADMIN_HASH = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'; // "admin"
+    // To change: generate new hash with: echo -n "newpassword" | sha256sum
+    var ADMIN_HASH = 'cfa4034bbc04a6b70ad23e6664204a21f0237b0fa9f295bb12195e671759b971';
 
     function tentarLogin() {
       var senha = document.getElementById('login-password').value;
-      // Simple hash check (for a static site this is the best we can do)
+      // Hash-based check only (never compare plaintext)
       hashSenha(senha).then(function(hash) {
-        if (hash === ADMIN_HASH || senha === 'papo2026') {
+        if (hash === ADMIN_HASH) {
           sessionStorage.setItem('admin_auth', 'true');
+          sessionStorage.setItem('admin_pass', senha);
           mostrarAdmin();
         } else {
           document.getElementById('login-error').style.display = 'block';
@@ -683,7 +684,7 @@
       fetch('https://eventos.papodesysadmin.org/api/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ eventos: eventosLimpos, senha: 'papo2026' }),
+        body: JSON.stringify({ eventos: eventosLimpos, senha: sessionStorage.getItem('admin_pass') || '' }),
       })
       .then(function(response) { return response.json(); })
       .then(function(result) {

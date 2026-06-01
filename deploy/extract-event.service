@@ -10,6 +10,7 @@ ExecStart=/usr/bin/node /var/www/eventos/api/extract-event.js
 Restart=on-failure
 RestartSec=5
 Environment=EXTRACT_PORT=3002
+EnvironmentFile=-/var/www/eventos/.env
 
 [Install]
 WantedBy=multi-user.target
