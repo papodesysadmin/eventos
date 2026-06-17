@@ -985,12 +985,8 @@
       });
     }
 
-    // Carregar cidades ao abrir o admin
-    var _originalMostrarAdmin = mostrarAdmin;
-    mostrarAdmin = function() {
-      _originalMostrarAdmin();
-      carregarCidades();
-    };
+    // Carregar cidades imediatamente
+    carregarCidades();
   </script>
   </div><!-- end admin-content -->
 </body>
