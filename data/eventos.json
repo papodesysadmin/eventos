@@ -343,5 +343,22 @@
       "confirmada": true,
       "tipo": "palestrante"
     }
+  },
+  {
+    "id": "faadaed2-8c35-4f6a-ada0-40f624dbe809",
+    "nome": "CEIA Open Day by AI Brasil  | Conecta CEIA 2026",
+    "dataInicio": "2026-06-12",
+    "local": "es InteligentesVinicius Alboneti Aguiar",
+    "cidade": "Goiânia",
+    "estado": "GO",
+    "pais": "Brasil",
+    "url": "https://conectaceia.aibrasil.ai/",
+    "categoria": "IA",
+    "dataFim": "2026-06-12",
+    "descricao": "Pela primeira vez, o Conecta CEIA abre uma janela para o mercado.",
+    "presenca": {
+      "confirmada": true,
+      "tipo": "palestrante"
+    }
   }
 ]
