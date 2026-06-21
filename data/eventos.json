@@ -377,5 +377,22 @@
       "confirmada": true,
       "tipo": "organizador"
     }
+  },
+  {
+    "id": "0df5d109-b781-441c-9268-a8afd6394807",
+    "nome": "Circuito de Inteligência Artificial@Tiktok - Intro Trae & AI Brasil · Luma",
+    "dataInicio": "2026-06-17",
+    "local": "Escritório do TikTok",
+    "cidade": "São Paulo",
+    "estado": "SP",
+    "pais": "Brasil",
+    "url": "https://luma.com/trae-a6r7?tk=Myrorl",
+    "categoria": "IA",
+    "dataFim": "2026-06-17",
+    "descricao": "​⚠ ️ **Aviso Importante:** As vagas são limitadas devido à segurança do prédio. A inscrição aqui no Luma é obrigatória para a liberação da sua entrada na portaria.",
+    "presenca": {
+      "confirmada": true,
+      "tipo": "organizador"
+    }
   }
 ]
