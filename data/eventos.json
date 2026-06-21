@@ -394,5 +394,22 @@
       "confirmada": true,
       "tipo": "organizador"
     }
+  },
+  {
+    "id": "5053889e-763b-466e-b120-ad8c1bab98ec",
+    "nome": "✨ Circuito de Inteligência Artificial 【TRAE x AI Brasil】@ TikTok — Showcase Day · Luma",
+    "dataInicio": "2026-06-20",
+    "local": "Escritório do TikTok",
+    "cidade": "São Paulo",
+    "estado": "SP",
+    "pais": "Brasil",
+    "url": "https://luma.com/fbzpps6o",
+    "categoria": "IA",
+    "dataFim": "2026-06-20",
+    "descricao": "​Chegou a hora de ver o que a comunidade está construindo de verdade! O Circuito de Inteligência Artificial pousa no escritório do TikTok para um sábado focado em quem bota a mão na massa.",
+    "presenca": {
+      "confirmada": true,
+      "tipo": "organizador"
+    }
   }
 ]
