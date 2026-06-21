@@ -360,5 +360,22 @@
       "confirmada": true,
       "tipo": "palestrante"
     }
+  },
+  {
+    "id": "0e85cf38-a102-46a2-ba7b-578314bd87fd",
+    "nome": "Circuito Aberto de IA — Oracle São Paulo",
+    "dataInicio": "2026-06-23",
+    "local": "Oracle Innovation Center",
+    "cidade": "São Paulo",
+    "estado": "SP",
+    "pais": "Brasil",
+    "url": "https://circuitoia.papodesysadmin.org/",
+    "categoria": "IA",
+    "dataFim": "2026-06-23",
+    "descricao": "Published Time: Tue, 16 Jun 2026 15:16:03 GMT",
+    "presenca": {
+      "confirmada": true,
+      "tipo": "organizador"
+    }
   }
 ]
