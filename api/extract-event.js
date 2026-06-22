@@ -1121,13 +1121,46 @@ const server = http.createServer(async (req, res) => {
       }
 
       // Single event extraction
-      // If we used Jina, extract from the markdown/text content
-      // If direct fetch, extract from HTML
-      const result = usedJina 
-        ? extractEventFromJinaContent(content, url)
-        : extractEventData(content, url);
+      // Strategy: use Jina result, but if incomplete, also try direct fetch and merge
+      let result;
       
-      console.log(`[extract] Result: success=${result.success}, fields=${Object.keys(result.data).length}, via=${usedJina ? 'jina' : 'direct'}`);
+      if (usedJina) {
+        result = extractEventFromJinaContent(content, url);
+        
+        // If Jina extraction is missing critical fields, try direct HTML fetch too
+        const criticalMissing = result.missingFields && 
+          result.missingFields.some(f => ['dataInicio', 'nome', 'local', 'cidade'].includes(f));
+        
+        if (criticalMissing || !result.success) {
+          console.log(`[extract] Jina incomplete (missing: ${(result.missingFields||[]).join(', ')}), trying direct fetch...`);
+          try {
+            const htmlContent = await fetchUrl(url);
+            const htmlResult = extractEventData(htmlContent, url);
+            
+            // Merge: fill gaps in Jina result with HTML result
+            if (htmlResult.data) {
+              for (const [key, value] of Object.entries(htmlResult.data)) {
+                if (value && !result.data[key]) {
+                  result.data[key] = value;
+                }
+              }
+              // Recalculate missing fields
+              const required = ['nome', 'dataInicio', 'local', 'cidade', 'estado', 'pais', 'url', 'categoria'];
+              result.missingFields = required.filter(f => !result.data[f]);
+              result.success = result.missingFields.length === 0;
+              if (result.success) delete result.error;
+              else result.error = `Campos não encontrados: ${result.missingFields.join(', ')}`;
+              console.log(`[extract] After merge: success=${result.success}, missing=${result.missingFields.join(',')}`);
+            }
+          } catch (fetchErr) {
+            console.log(`[extract] Direct fetch also failed: ${fetchErr.message}`);
+          }
+        }
+      } else {
+        result = extractEventData(content, url);
+      }
+      
+      console.log(`[extract] Result: success=${result.success}, fields=${Object.keys(result.data).length}, via=${usedJina ? 'jina+merge' : 'direct'}`);
 
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(result));
