@@ -1014,21 +1014,10 @@ const server = http.createServer(async (req, res) => {
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
       try {
-        const { eventos, senha } = JSON.parse(body);
+        const { eventos } = JSON.parse(body);
         
-        // Auth: senha lida de variável de ambiente (nunca hardcoded)
-        const adminPassword = process.env.ADMIN_PASSWORD || process.env.EVENTOS_ADMIN_PASS;
-        if (!adminPassword) {
-          console.error('[save] ADMIN_PASSWORD não configurada no ambiente');
-          res.writeHead(500, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Configuração de autenticação ausente no servidor' }));
-          return;
-        }
-        if (senha !== adminPassword) {
-          res.writeHead(401, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Não autorizado' }));
-          return;
-        }
+        // Autenticação feita pelo Cloudflare Access (Zero Trust)
+        // O endpoint só é acessível após validação no edge
 
         if (!Array.isArray(eventos)) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
