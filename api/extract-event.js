@@ -784,10 +784,33 @@ function extractEventFromJinaContent(content, originalUrl) {
     }
   }
 
-  // Extract description from meta or first meaningful paragraph
-  const descLine = lines.find(l => l.length > 30 && l.length < 250 && !l.startsWith('!') && !l.startsWith('[') && !l.startsWith('#') && !l.startsWith('*') && !l.startsWith('Title:') && !l.startsWith('URL Source:') && !l.includes('cookie') && !l.includes('WhatsApp') && !l.includes('preencha'));
-  if (descLine) {
-    data.descricao = descLine.trim().substring(0, 200);
+  // Extract description: prioritize "About Event" / "Sobre o Evento" sections
+  if (!data.descricao) {
+    // Look for content after "About Event", "Sobre o Evento", "Sobre", "Description"
+    const aboutIndex = lines.findIndex(l => l.match(/^(?:#+\s*)?(?:About Event|Sobre o Evento|Sobre|Description|Descrição)\s*$/i));
+    if (aboutIndex >= 0) {
+      // Collect next meaningful lines after the header
+      const descParts = [];
+      for (let i = aboutIndex + 1; i < Math.min(aboutIndex + 10, lines.length); i++) {
+        const line = lines[i].replace(/^[​\s]+/, '').trim(); // remove zero-width spaces
+        if (!line) continue;
+        if (line.startsWith('#') || line.startsWith('!') || line.startsWith('[')) break;
+        if (line.length < 5) continue;
+        descParts.push(line);
+        if (descParts.join(' ').length > 180) break;
+      }
+      if (descParts.length > 0) {
+        data.descricao = descParts.join(' ').substring(0, 200);
+      }
+    }
+  }
+
+  // Fallback: first meaningful paragraph (excluding registration/cookie text)
+  if (!data.descricao) {
+    const descLine = lines.find(l => l.length > 30 && l.length < 250 && !l.startsWith('!') && !l.startsWith('[') && !l.startsWith('#') && !l.startsWith('*') && !l.startsWith('Title:') && !l.startsWith('URL Source:') && !l.includes('cookie') && !l.includes('WhatsApp') && !l.includes('preencha') && !l.includes('register') && !l.includes('Register') && !l.includes('Welcome! To'));
+    if (descLine) {
+      data.descricao = descLine.trim().substring(0, 200);
+    }
   }
 
   // URL
