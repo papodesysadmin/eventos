@@ -316,7 +316,7 @@
         <thead>
           <tr>
             <th>Nome</th>
-            <th>Data Início</th>
+            <th style="cursor:pointer;user-select:none;" onclick="toggleSortData()" id="th-data">Data Início <span id="sort-icon">▲</span></th>
             <th>Categoria</th>
             <th>Presença</th>
             <th>Ações</th>
@@ -368,6 +368,19 @@
         document.getElementById('loading-msg').textContent =
           'Erro ao carregar eventos. Verifique se o arquivo data/eventos.json existe.';
       }
+    }
+
+    var sortOrder = 'asc'; // 'asc' ou 'desc'
+
+    function toggleSortData() {
+      sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+      document.getElementById('sort-icon').textContent = sortOrder === 'asc' ? '▲' : '▼';
+      eventos.sort(function(a, b) {
+        var dA = a.dataInicio || '';
+        var dB = b.dataInicio || '';
+        return sortOrder === 'asc' ? dA.localeCompare(dB) : dB.localeCompare(dA);
+      });
+      renderizarTabela();
     }
 
     function renderizarTabela() {
