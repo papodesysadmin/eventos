@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "id": "41f537a1-2ab2-40fd-a4ae-7d83cc5bbbe7",
+    "nome": "AWS Community Day Brasil 2026",
+    "dataInicio": "2026-06-27",
+    "cidade": "Brasília",
+    "estado": "DF",
+    "pais": "Brasil",
+    "url": "https://awscommunityday.com.br/centro-oeste/",
+    "categoria": "Cloud",
+    "dataFim": "2026-06-27",
+    "descricao": "Edição Centro-Oeste · Taguatinga/DF",
+    "presenca": {
+      "confirmada": true,
+      "tipo": "participante"
+    }
+  }
+]
