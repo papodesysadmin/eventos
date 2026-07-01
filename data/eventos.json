@@ -14,5 +14,19 @@
       "confirmada": true,
       "tipo": "participante"
     }
+  },
+  {
+    "id": "609f56e0-9ff5-4765-b9c3-c8a511d68754",
+    "nome": "Salt Security + Owasp",
+    "dataInicio": "2026-08-05",
+    "local": "Remoto",
+    "pais": "Brasil",
+    "categoria": "Seguranca",
+    "dataFim": "2026-08-05",
+    "descricao": "Segurança Agêntica – APIs, MCPs, agentes AI",
+    "presenca": {
+      "confirmada": true,
+      "tipo": "palestrante"
+    }
   }
 ]
